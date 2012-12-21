@@ -1,0 +1,30 @@
+From d81ba58e4eceb5835eac89e28882bc1c7d0ff2a9 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Sat, 8 Dec 2012 10:26:01 +0100
+Subject: [PATCH 06/10] ARM: zynq: I2C: optimize wait delay
+
+Optimize the wait delay for I2C status polling
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ drivers/i2c/zynq_i2c.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/i2c/zynq_i2c.c b/drivers/i2c/zynq_i2c.c
+index e22d432..acc9305 100755
+--- a/drivers/i2c/zynq_i2c.c
++++ b/drivers/i2c/zynq_i2c.c
+@@ -172,8 +172,8 @@ static void zynq_i2c_debug_status(void)
+ static u32 zynq_i2c_wait(u32 mask)
+ {
+ 	int timeout, int_status;
+-	for (timeout = 0; timeout < 100; timeout++) {
+-		udelay(100);
++	for (timeout = 0; timeout < 200; timeout++) {
++		udelay(50);
+ 		int_status = Xin_le32(&zynq_i2c->interrupt_status);
+ 		if (int_status & mask)
+ 			break;
+-- 
+1.7.4.1
+

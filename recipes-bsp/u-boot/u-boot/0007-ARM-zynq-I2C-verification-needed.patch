@@ -1,0 +1,58 @@
+From b951daeeb76cd1fad0b2f6fa1f09117442f55cf8 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Sat, 8 Dec 2012 10:32:18 +0100
+Subject: [PATCH 07/10] ARM: zynq: I2C: verification needed
+
+List of points to verify to fix the I2C block read issue
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ drivers/i2c/zynq_i2c.c |   16 ++++++++++++++++
+ 1 files changed, 16 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/i2c/zynq_i2c.c b/drivers/i2c/zynq_i2c.c
+index acc9305..3dbd348 100755
+--- a/drivers/i2c/zynq_i2c.c
++++ b/drivers/i2c/zynq_i2c.c
+@@ -222,15 +222,30 @@ int i2c_read(u8 dev, uint addr, int alen, u8 *data, int length)
+ 	/* Write the register address */
+ 	Xsetbits_le32(&zynq_i2c->control, ZYNQ_I2C_CONTROL_CLR_FIFO |
+ 		ZYNQ_I2C_CONTROL_HOLD);
++
++
++	/* !!! check if FIFO is cleared / ready !!! */
++	/* !!! check if transmit_size !!! */
++
++
+ 	/* Temporarily disable restart (by clearing hold)... */
+ 	/* It doesn't seem to work. */
+ 	Xclrbits_le32(&zynq_i2c->control, ZYNQ_I2C_CONTROL_RW |
+ 		ZYNQ_I2C_CONTROL_HOLD);
++
++	/* !!! check interrupts status */
++
+ 	Xout_le32(&zynq_i2c->interrupt_status, 0xFF);
+ 	while (alen--)
+ 		Xout_le32(&zynq_i2c->data, addr >> (8*alen));
++
++	/* !!! check if FIFO has 2 bytes !!! */
++
+ 	Xout_le32(&zynq_i2c->address, dev);
+ 
++	/* !!! check status, should be cleared !!! */
++	//printf ("aft status: 0x%04X\n", Xin_le32(&zynq_i2c->interrupt_status));
++
+ 	/* wait for the address to be sent */
+ 	if (!zynq_i2c_wait(ZYNQ_I2C_INTERRUPT_COMP)) {
+ 		/* Release the bus */
+@@ -251,6 +266,7 @@ int i2c_read(u8 dev, uint addr, int alen, u8 *data, int length)
+ 			ZYNQ_I2C_INTERRUPT_DATA);
+ 		if (!status) {
+ 			/* Release the bus */
++			debug ("TimeOut waiting for data\n");
+ 			Xclrbits_le32(&zynq_i2c->control, ZYNQ_I2C_CONTROL_HOLD);
+ 			return ETIMEDOUT;
+ 		}
+-- 
+1.7.4.1
+

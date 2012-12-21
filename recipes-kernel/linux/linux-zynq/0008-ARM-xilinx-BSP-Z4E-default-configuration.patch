@@ -1,0 +1,63 @@
+From e5498e5d15f6c611bab3ba3deaf524f3b42b89e7 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 28 Nov 2012 21:36:15 +0100
+Subject: [PATCH 08/12] ARM: xilinx: BSP: Z4E default configuration
+
+Added further networking support (IPv6, bridge, PHY driver)
+to the default configuration for the NetModule Z4E Board
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ arch/arm/configs/netmodule_z4e_defconfig |   11 +++++++----
+ 1 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/configs/netmodule_z4e_defconfig b/arch/arm/configs/netmodule_z4e_defconfig
+index 65666cf..e59fc7c 100644
+--- a/arch/arm/configs/netmodule_z4e_defconfig
++++ b/arch/arm/configs/netmodule_z4e_defconfig
+@@ -536,7 +536,7 @@ CONFIG_INET_TCP_DIAG=y
+ CONFIG_TCP_CONG_CUBIC=y
+ CONFIG_DEFAULT_TCP_CONG="cubic"
+ # CONFIG_TCP_MD5SIG is not set
+-CONFIG_IPV6=m
++CONFIG_IPV6=y
+ # CONFIG_IPV6_PRIVACY is not set
+ # CONFIG_IPV6_ROUTER_PREF is not set
+ # CONFIG_IPV6_OPTIMISTIC_DAD is not set
+@@ -565,11 +565,14 @@ CONFIG_IPV6_NDISC_NODETYPE=y
+ # CONFIG_TIPC is not set
+ # CONFIG_ATM is not set
+ # CONFIG_L2TP is not set
+-# CONFIG_BRIDGE is not set
++CONFIG_STP=y
++CONFIG_BRIDGE=y
++CONFIG_BRIDGE_IGMP_SNOOPING=y
+ # CONFIG_NET_DSA is not set
+ CONFIG_VLAN_8021Q=m
+ # CONFIG_VLAN_8021Q_GVRP is not set
+ # CONFIG_DECNET is not set
++CONFIG_LLC=y
+ # CONFIG_LLC2 is not set
+ # CONFIG_IPX is not set
+ # CONFIG_ATALK is not set
+@@ -877,7 +880,7 @@ CONFIG_NET_CORE=y
+ # CONFIG_NETCONSOLE is not set
+ # CONFIG_NETPOLL is not set
+ # CONFIG_NET_POLL_CONTROLLER is not set
+-# CONFIG_TUN is not set
++CONFIG_TUN=y
+ # CONFIG_VETH is not set
+ 
+ #
+@@ -941,7 +944,7 @@ CONFIG_VITESSE_PHY=y
+ # CONFIG_NATIONAL_PHY is not set
+ # CONFIG_STE10XP is not set
+ # CONFIG_LSI_ET1011C_PHY is not set
+-# CONFIG_MICREL_PHY is not set
++CONFIG_MICREL_PHY=y
+ # CONFIG_FIXED_PHY is not set
+ CONFIG_MDIO_BITBANG=y
+ # CONFIG_MDIO_GPIO is not set
+-- 
+1.7.4.1
+

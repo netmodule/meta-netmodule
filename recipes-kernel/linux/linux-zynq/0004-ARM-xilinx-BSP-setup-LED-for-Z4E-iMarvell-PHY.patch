@@ -1,0 +1,59 @@
+From 0c4ada71e471f00a33c642774a65d0ecbfa9f2aa Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Thu, 22 Nov 2012 14:29:18 +0100
+Subject: [PATCH 04/12] ARM: xilinx: BSP: setup LED for Z4E iMarvell PHY
+
+Added custom LED settings in the Marvell driver for NetModule
+Z4E Board
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ drivers/net/phy/marvell.c |   21 ++++++++++++++++++---
+ 1 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index a852637..0221283 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -375,20 +375,35 @@ static int m88e1116r_config_init(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 
+-#if 0 /* @@NetModule, da, do not overwrite the bootloader settings */
+ 	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 2);
+ 	if (err < 0)
+ 		return err;
+ 	temp = phy_read(phydev, MII_M1116R_CONTROL_REG_MAC);
+-	temp |= (1 << 5);
++	temp &= ~(1 << 5);  /* @@ NetModule, da, set correct mode for Z4E board */
+ 	temp |= (1 << 4);
+ 	err = phy_write(phydev, MII_M1116R_CONTROL_REG_MAC, temp);
+ 	if (err < 0)
+ 		return err;
++
++	/* @@ NetModule, da, LED settings */
++	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 3);
++	if (err < 0)
++		return err;
++
++	temp = 0x1040;
++	err = phy_write(phydev, 16, temp);
++	if (err < 0)
++		return err;
++
++	temp = 0x4405;
++	err = phy_write(phydev, 17, temp);
++	if (err < 0)
++		return err;
++
++
+ 	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 0);
+ 	if (err < 0)
+ 		return err;
+-#endif
+ 
+ 	temp = phy_read(phydev, MII_BMCR);
+ 	temp |= BMCR_RESET;
+-- 
+1.7.4.1
+

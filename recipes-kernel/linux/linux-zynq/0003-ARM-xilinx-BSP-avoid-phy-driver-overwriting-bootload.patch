@@ -1,0 +1,36 @@
+From fc8713fef1c84169888aa9d9c8f2a9554d54e34b Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Fri, 16 Nov 2012 13:57:28 +0100
+Subject: [PATCH 03/12] ARM: xilinx: BSP: avoid phy driver overwriting bootloader settings
+
+Marvell PHY driver for 1116 is overwriting the timings
+for Gigabit. Comment out
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ drivers/net/phy/marvell.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 06c31b6..a852637 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -375,6 +375,7 @@ static int m88e1116r_config_init(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 
++#if 0 /* @@NetModule, da, do not overwrite the bootloader settings */
+ 	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 2);
+ 	if (err < 0)
+ 		return err;
+@@ -387,6 +388,7 @@ static int m88e1116r_config_init(struct phy_device *phydev)
+ 	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 0);
+ 	if (err < 0)
+ 		return err;
++#endif
+ 
+ 	temp = phy_read(phydev, MII_BMCR);
+ 	temp |= BMCR_RESET;
+-- 
+1.7.4.1
+
