@@ -1,6 +1,6 @@
-An OpenEmbedded/Yocto BSP Layer from NetModule <www.netmodule.com>, 
-use this layers with Enclustra ZX3 Module and PM3 Baseboard 
-or the NetModule Zynq4Ethernet Platform.
+OpenEmbedded/Yocto BSP Layer from NetModule <www.netmodule.com>.
+Use this layer with the Enclustra ZX3 Module and PM3 Baseboard
+<http://www.enclustra.com> or the NetModule Zynq4Ethernet Platform.
 
 It is hosted at http://git.github.org/cgit/cgit.cgi/meta-metmodule/
 
@@ -9,13 +9,14 @@ URI: git://git.yoctoproject.org/poky
 layers: meta, meta-yocto, meta-yocto-bsp
 branch: 1.3
 
-The base BSP part of meta-netmodule should work with different OpenEmbedded/Yocto 
-distributions and layer stacks.
+The base BSP part of meta-netmodule should work with different 
+OpenEmbedded/Yocto distributions and layer stacks.
 
-Please follow the recommended setup procedures of your OE distribution. Or see our wiki at
-https://github.com/netmodule/meta-netmodule/wiki
+Please follow the recommended setup procedures of your OE distribution. Or see 
+our wiki at https://github.com/netmodule/meta-netmodule/wiki
 
-Send pull requests, patches, comments or questions to the maintainers listed below.
+Send pull requests, patches, comments or questions to the maintainers listed
+below.
 
-Maintainers:	David Andrey <david.andrey@netmodule.com> 
-				Stefan Eichenberger <stefan.eichenberger@netmodule.com>
+Maintainers:    David Andrey <david.andrey@netmodule.com> 
+                Stefan Eichenberger <stefan.eichenberger@netmodule.com>
