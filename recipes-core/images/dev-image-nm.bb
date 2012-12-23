@@ -25,7 +25,6 @@ IMAGE_INSTALL += "packagegroup-core-boot \
 				openssh-sftp-server \
 				${ROOTFS_PKGMANAGE_BOOTSTRAP} \
 				${CORE_IMAGE_EXTRA_INSTALL} \
-                meta-ide-support \
 				"
 
 IMAGE_LINGUAS = " "
