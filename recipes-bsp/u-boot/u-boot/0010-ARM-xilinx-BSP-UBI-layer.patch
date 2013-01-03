@@ -1,0 +1,57 @@
+From aa0195333a1286e03cad642d32cdaa24f74a54e5 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Tue, 18 Dec 2012 07:21:43 +0100
+Subject: [PATCH 10/12] ARM: xilinx: BSP: UBI layer
+
+Add UBI support and use it for kernel and DTB storage
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ include/configs/zynq4ethernet.h |   17 +++++++++++++++--
+ 1 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/zynq4ethernet.h b/include/configs/zynq4ethernet.h
+index 3133a2e..454a280 100644
+--- a/include/configs/zynq4ethernet.h
++++ b/include/configs/zynq4ethernet.h
+@@ -38,6 +38,15 @@
+ #define CONFIG_MMC
+ #define CONFIG_NAND_ZYNQ
+ 
++#define CONFIG_CMD_MTDPARTS
++#define CONFIG_MTD_PARTITIONS
++#define CONFIG_RBTREE
++#define CONFIG_CMD_UBI
++
++#define MTDIDS_DEFAULT          "nand0=nand"
++#define MTDPARTS_DEFAULT        "mtdparts=nand:5m(nand-linux),"\
++                    "1m(nand-device-tree),-(nand-rootfs)"
++
+ #include <configs/zynq_common.h>
+ 
+ #undef CONFIG_EXTRA_ENV_SETTINGS
+@@ -53,6 +62,8 @@
+     "nand_devicetree_size=0x10000\0" \
+     "fdt_high=0x20000000\0" \
+     "initrd_high=0x20000000\0"  \
++    "mtdids=" MTDIDS_DEFAULT "\0"    \
++    "mtdparts=" MTDPARTS_DEFAULT "\0" \
+     "nandargs=setenv bootargs console=ttyPS0,115200 " \
+         "root=ubi0:ubi-rootfs rw " \
+         "rootfstype=ubifs " \
+@@ -66,8 +77,10 @@
+         "$othbootargs " \
+         "earlyprintk\0" \
+     "prodboot=echo Booting on NAND...;" \
+-        "nand read 0x3000000 0x000000 ${nand_kernel_size};" \
+-        "nand read 0x2A00000 0x500000 ${nand_devicetree_size};" \
++        "ubi part nand-linux;" \
++        "ubi read 0x3000000 kernel ${nand_kernel_size};" \
++        "ubi part nand-device-tree;" \
++        "ubi read 0x2A00000 dtb ${nand_devicetree_size};" \
+         "run nandargs;" \
+         "bootm 0x3000000 - 0x2A00000\0" \
+     "rescboot=echo Booting on QSPI Flash...;" \
+-- 
+1.7.4.1
+

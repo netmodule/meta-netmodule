@@ -1,7 +1,7 @@
-From 7f8444f9bf538d9a22504b2efac08a2c32e40bc4 Mon Sep 17 00:00:00 2001
+From 63a1583b5e34f0c647828623c2359a9d939f8697 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 14 Dec 2012 17:09:41 +0100
-Subject: [PATCH 09/10] ARM: xilinx: BSP: auto boot for Z4E
+Subject: [PATCH 09/12] ARM: xilinx: BSP: auto boot for Z4E
 
 Add auto boot for the Z4E board
 
@@ -9,12 +9,13 @@ Signed-off-by:David Andrey david.andrey@netmodule.com
 ---
  include/configs/zynq4ethernet.h |    4 +++-
  1 files changed, 3 insertions(+), 1 deletions(-)
- mode change 100644 => 100755 include/configs/zynq4ethernet.h
+ mode change 100755 => 100644 drivers/i2c/zynq_i2c.c
 
+diff --git a/drivers/i2c/zynq_i2c.c b/drivers/i2c/zynq_i2c.c
+old mode 100755
+new mode 100644
 diff --git a/include/configs/zynq4ethernet.h b/include/configs/zynq4ethernet.h
-old mode 100644
-new mode 100755
-index b31ef48..3133a2e
+index b31ef48..3133a2e 100644
 --- a/include/configs/zynq4ethernet.h
 +++ b/include/configs/zynq4ethernet.h
 @@ -86,9 +86,11 @@

@@ -19,6 +19,9 @@ SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch  
                     file://0007-ARM-zynq-I2C-verification-needed.patch \
                     file://0008-ARM-zynq-BSP-add-I2C-for-Z4E-board.patch \ 
                     file://0009-ARM-xilinx-BSP-auto-boot-for-Z4E.patch \
+                    file://0010-ARM-xilinx-BSP-UBI-layer.patch \
+                    file://0011-ARM-xilinx-BSP-UBI-support-for-ZX3_PM3.patch \
+                    file://0012-ARM-xilinx-BSP-use-legacy-ETH-driver-for-ZX3_PM3.patch \
                   "
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 
