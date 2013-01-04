@@ -19,9 +19,11 @@ python () {
 # Some versions of u-boot use .bin and others use .img.  By default use .bin
 # but enable individual recipes to change this value.
 UBOOT_SUFFIX ?= "bin"
-UBOOT_IMAGE ?= "u-boot-${MACHINE}-${PV}-${PR}.${UBOOT_SUFFIX}"
-UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
-UBOOT_SYMLINK ?= "u-boot-${MACHINE}.${UBOOT_SUFFIX}"
+UBOOT_ELF_SUFFIX ?= "elf"
+UBOOT_IMAGE ?= "u-boot-${MACHINE}-${PV}-${PR}"
+UBOOT_ELF ?= "u-boot"
+UBOOT_BINARY ?= "u-boot"
+UBOOT_SYMLINK ?= "u-boot-${MACHINE}"
 UBOOT_MAKE_TARGET ?= "all"
 
 # Some versions of u-boot build an SPL (Second Program Loader) image that
@@ -46,8 +48,8 @@ do_compile () {
 
 do_install () {
     install -d ${D}/boot
-    install ${S}/${UBOOT_BINARY} ${D}/boot/${UBOOT_IMAGE}
-    ln -sf ${UBOOT_IMAGE} ${D}/boot/${UBOOT_BINARY}
+    install ${S}/${UBOOT_BINARY}.${UBOOT_SUFFIX} ${D}/boot/${UBOOT_IMAGE}.${UBOOT_SUFFIX}
+    ln -sf ${UBOOT_IMAGE}.${UBOOT_SUFFIX} ${D}/boot/${UBOOT_BINARY}.${UBOOT_SUFFIX}
 
     if [ -e ${WORKDIR}/fw_env.config ] ; then
         install -d ${D}${sysconfdir}
@@ -66,12 +68,17 @@ FILESPATH =. "${FILE_DIRNAME}/u-boot-git/${MACHINE}:"
 
 do_deploy () {
     install -d ${DEPLOYDIR}
-    install ${S}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
-
+    install ${S}/${UBOOT_BINARY}.${UBOOT_SUFFIX} ${DEPLOYDIR}/${UBOOT_IMAGE}.${UBOOT_SUFFIX}
+    install ${S}/${UBOOT_ELF} ${DEPLOYDIR}/${UBOOT_IMAGE}.${UBOOT_ELF_SUFFIX}
+    
     cd ${DEPLOYDIR}
-    rm -f ${UBOOT_BINARY} ${UBOOT_SYMLINK}
-    ln -sf ${UBOOT_IMAGE} ${UBOOT_SYMLINK}
-    ln -sf ${UBOOT_IMAGE} ${UBOOT_BINARY}
+    rm -f ${UBOOT_BINARY}.${UBOOT_SUFFIX} ${UBOOT_SYMLINK}.${UBOOT_SUFFIX}
+    ln -sf ${UBOOT_IMAGE}.${UBOOT_SUFFIX} ${UBOOT_SYMLINK}.${UBOOT_SUFFIX}
+    ln -sf ${UBOOT_IMAGE}.${UBOOT_SUFFIX} ${UBOOT_BINARY}.${UBOOT_SUFFIX}
+    
+    rm -f ${UBOOT_BINARY}.${UBOOT_ELF_SUFFIX} ${UBOOT_SYMLINK}.${UBOOT_ELF_SUFFIX}
+    ln -sf ${UBOOT_IMAGE}.${UBOOT_ELF_SUFFIX} ${UBOOT_SYMLINK}.${UBOOT_ELF_SUFFIX}
+    ln -sf ${UBOOT_IMAGE}.${UBOOT_ELF_SUFFIX} ${UBOOT_BINARY}.${UBOOT_ELF_SUFFIX}
 
     if [ "x${SPL_BINARY}" != "x" ]
     then
