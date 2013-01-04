@@ -13,10 +13,10 @@ SRC_URI =  "file://devmem2.c"
 S = "${WORKDIR}"
 
 do_compile() {
-	${CC} devmem2.c -o devmem2
+    ${CC} devmem2.c -o devmem2
 }
 
 do_install () {
-	install -d ${D}${bindir}
-	install -m 0755 devmem2 ${D}${bindir}
+    install -d ${D}${bindir}
+    install -m 0755 devmem2 ${D}${bindir}
 }

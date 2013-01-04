@@ -1,0 +1,305 @@
+From 7219ce676259ef6141715f5fa418b584a4f90377 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Tue, 18 Dec 2012 15:47:56 +0100
+Subject: [PATCH 12/12] ARM: xilinx: BSP: use legacy ETH driver for ZX3_PM3
+
+Ethernet is, for some unknown reasons, no working with
+the new GEM driver. Switch back to the old one.
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ drivers/net/zynq_gem_wrap.c |  145 +++++++++++++++++++++++++++++++-----------
+ include/configs/zx3_pm3.h   |   13 +++-
+ 2 files changed, 117 insertions(+), 41 deletions(-)
+ mode change 100644 => 100755 drivers/net/zynq_gem_wrap.c
+
+diff --git a/drivers/net/zynq_gem_wrap.c b/drivers/net/zynq_gem_wrap.c
+old mode 100644
+new mode 100755
+index c4ef62f..7669cdf
+--- a/drivers/net/zynq_gem_wrap.c
++++ b/drivers/net/zynq_gem_wrap.c
+@@ -143,9 +143,11 @@ static void Out32(u32 OutAddress, u32 Value)
+ 
+ /*****************************************************************************/
+ 
++/* One time init called during board init */
+ int Xgmac_one_time_init(void)
+ {
+ 	int tmp;
++	int phy_id;
+ 	int Status;
+ 	XEmacPss_Config *Config;
+ 	XEmacPss *EmacPssInstancePtr = &EmacPssInstance;
+@@ -229,15 +231,82 @@ int Xgmac_one_time_init(void)
+ 	XEmacPss_WriteReg(EmacPssInstancePtr->Config.BaseAddress,
+ 			  XEMACPSS_NWCTRL_OFFSET, tmp);
+ 
++	/* PHY one time init */
++	/* Must be done for proper operation for OS (linux, etc), PHY init not done by OS */
++
++	/* Get PHY ID */
++	phy_id  = phy_rd(EmacPssInstancePtr, 2) << 16;
++	phy_id |= phy_rd(EmacPssInstancePtr, 3);
++
++	debug("Phy ID: %08X\n", phy_id);
++
++#ifdef CONFIG_EP107
++	/* Extended PHY specific control register */
++	tmp = phy_rd(EmacPssInstancePtr, 20);
++	tmp |= (7 << 9);	/* max number of gigabit attempts */
++	tmp |= (1 << 8);	/* enable downshift */
++	tmp |= (1 << 7);	/* RGMII receive timing internally delayed */
++	tmp |= (1 << 1);	/* RGMII transmit clock internally delayed */
++	phy_wr(EmacPssInstancePtr, 20, tmp);
++
++#elif defined (CONFIG_ZX3_PM3)
++	/* Extended PHY registers */
++	/* Check if PHY is supported */
++	if ((phy_id >> 10) == 0x885) {	/* Micrel's OUI ? */
++		if (((phy_id >> 4) & 0x2F) == 0x21) {	/* KSZ9021, used on first board series */
++			phy_wr(EmacPssInstancePtr, 0xB, 0x8104);   // RGMII clock and control pad skew (reg 260)
++			phy_wr(EmacPssInstancePtr, 0xC, 0xF0F0);
++			phy_wr(EmacPssInstancePtr, 0xB, 0x8105);   // RGMII RX pad skew (reg 261)
++			phy_wr(EmacPssInstancePtr, 0xC, 0x0);
++		}
++
++		else if (((phy_id >> 4) & 0x2F) == 0x22) {	/* KSZ9031 */
++			phy_wr(EmacPssInstancePtr, 0xD, 0x0002);
++			phy_wr(EmacPssInstancePtr, 0xE, 0x0008); // Reg 0x8
++			phy_wr(EmacPssInstancePtr, 0xD, 0x4002);
++			phy_wr(EmacPssInstancePtr, 0xE, 0x03FF); //3FF = max RXC and TXC delay
++		}
++		else {
++			printf ("unsupported PHY Model, ID:0x%08X\n", phy_id);
++		}
++	}
++	else {
++		printf ("unsupported PHY, ID:0x%08X\n", phy_id);
++	}
++#else
++	/* Copper specific control register 1 */
++	tmp = phy_rd(EmacPssInstancePtr, 16);
++	tmp |= (7 << 12);	/* max number of gigabit attempts */
++	tmp |= (1 << 11);	/* enable downshift */
++	phy_wr(EmacPssInstancePtr, 16, tmp);
++
++	/* Control register - MAC */
++	phy_wr(EmacPssInstancePtr, 22, 2);	/* page 2 */
++	tmp = phy_rd(EmacPssInstancePtr, 21);
++	tmp |= (1 << 5);	/* RGMII receive timing transition when data stable */
++	tmp |= (1 << 4);	/* RGMII transmit clock internally delayed */
++	phy_wr(EmacPssInstancePtr, 21, tmp);
++	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
++#endif
++
+ 	return 0;
+ }
+ 
++/* Link initialization. Will be done only if U-Boot starts some network activity */
+ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ {
+ 	int tmp;
+ 	int link_speed;
+ 	XEmacPss *EmacPssInstancePtr = &EmacPssInstance;
+ 
++#ifdef CONFIG_ZX3_PM3
++	/* Check if the link has changed (plug/unplug, auto-neg) */
++	tmp = phy_rd(EmacPssInstancePtr, 0x1B);	/* Interrupt status register */
++	if (tmp & 0x0005) {	/* link up or down detected */
++		ethstate.initialized = 0;
++	}
++#endif
++
+ 	if (ethstate.initialized)
+ 		return 1;
+ 
+@@ -264,12 +333,9 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 
+ 	/*************************** PHY Setup ***************************/
+ 
++#ifndef CONFIG_ZX3_PM3	/* Please define the specific board / PHY !!! */
+ 	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
+-
+-	tmp = phy_rd(EmacPssInstancePtr, 2);
+-	printf("Phy ID: %04X", tmp);
+-	tmp = phy_rd(EmacPssInstancePtr, 3);
+-	printf("%04X\n", tmp);
++#endif
+ 
+ 	/* Auto-negotiation advertisement register */
+ 	tmp = phy_rd(EmacPssInstancePtr, 4);
+@@ -277,30 +343,6 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 	tmp |= (1 << 10);	/* MAC pause implemented */
+ 	phy_wr(EmacPssInstancePtr, 4, tmp);
+ 
+-#ifdef CONFIG_EP107
+-	/* Extended PHY specific control register */
+-	tmp = phy_rd(EmacPssInstancePtr, 20);
+-	tmp |= (7 << 9);	/* max number of gigabit attempts */
+-	tmp |= (1 << 8);	/* enable downshift */
+-	tmp |= (1 << 7);	/* RGMII receive timing internally delayed */
+-	tmp |= (1 << 1);	/* RGMII transmit clock internally delayed */
+-	phy_wr(EmacPssInstancePtr, 20, tmp);
+-#else
+-	/* Copper specific control register 1 */
+-	tmp = phy_rd(EmacPssInstancePtr, 16);
+-	tmp |= (7 << 12);	/* max number of gigabit attempts */
+-	tmp |= (1 << 11);	/* enable downshift */
+-	phy_wr(EmacPssInstancePtr, 16, tmp);
+-
+-	/* Control register - MAC */
+-	phy_wr(EmacPssInstancePtr, 22, 2);	/* page 2 */
+-	tmp = phy_rd(EmacPssInstancePtr, 21);
+-	tmp |= (1 << 5);	/* RGMII receive timing transition when data stable */
+-	tmp |= (1 << 4);	/* RGMII transmit clock internally delayed */
+-	phy_wr(EmacPssInstancePtr, 21, tmp);
+-	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
+-#endif
+-
+ 	/* Control register */
+ 	tmp = phy_rd(EmacPssInstancePtr, 0);
+ 	tmp |= (1 << 12);	/* auto-negotiation enable */
+@@ -314,10 +356,10 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 	 */
+ 	Xgmac_set_eth_advertise(EmacPssInstancePtr, 100);
+ #else
+-	/* CR-659040 */
+-	/* Could be 1000 if an unknown bug is fixed */
+ 	Xgmac_set_eth_advertise(EmacPssInstancePtr, 1000);
+ #endif
++
++	/* restart auto-negotiation */
+ 	phy_rst(EmacPssInstancePtr);
+ 
+ 	/* Attempt auto-negotiation */
+@@ -333,6 +375,14 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 	}
+ 
+ 	/* Check if the link is up */
++#ifdef CONFIG_ZX3_PM3	/* should be the generic code ?! */
++	tmp = phy_rd(EmacPssInstancePtr, 1);
++	if (!((tmp >> 2) & 1)) {
++		puts("***Error: Link is not up.\n");
++		return -1;
++	}
++
++#else	/* Please define the specific board / PHY !!! */
+ 	tmp = phy_rd(EmacPssInstancePtr, 17);
+ 	if (  ((tmp >> 10) & 1) ) {
+ 		/* Check for an auto-negotiation error */
+@@ -345,8 +395,19 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 		puts("***Error: Link is not up.\n");
+ 		return -1;
+ 	}
++#endif
+ 
+ 	/********************** Determine link speed **********************/
++#ifdef CONFIG_ZX3_PM3
++	tmp = phy_rd(EmacPssInstancePtr, 31); //MICREL PHY KSZ9021RN Control Reg
++	if ( ((tmp>>6 ) & 1) == 1)		/* 1000Mbps */
++		link_speed = 1000;
++	else if ( ((tmp>>5 ) & 1) == 1)	/* 100Mbps */
++		link_speed = 100;
++	else							/* 10Mbps */
++		link_speed = 10;
++
++#else
+ 	tmp = phy_rd(EmacPssInstancePtr, 17);
+ 	if ( ((tmp >> 14) & 3) == 2)		/* 1000Mbps */
+ 		link_speed = 1000;
+@@ -354,6 +415,7 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 		link_speed = 100;
+ 	else					/* 10Mbps */
+ 		link_speed = 10;
++#endif
+ 
+ 	/*************************** MAC Setup ***************************/
+ 	tmp = XEmacPss_ReadReg(EmacPssInstancePtr->Config.BaseAddress,
+@@ -398,12 +460,14 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 
+ 	printf("Link is now at %dMbps!\n", link_speed);
+ 
++	tmp = phy_rd(EmacPssInstancePtr, 0x1B);	/* Clear interrupt status register */
+ 	ethstate.initialized = 1;
+ 	return 0;
+ }
+ 
+ void Xgmac_halt(struct eth_device *dev)
+ {
++	/* TODO halt RX, else the buffer are filled with garbage */
+ 	return;
+ }
+ 
+@@ -570,10 +634,6 @@ int zynq_gem_initialize_old(bd_t *bis)
+ 	memset(dev, 0, sizeof(*dev));
+ 	sprintf(dev->name, "zynq_gem");
+ 
+-	if (Xgmac_one_time_init() < 0) {
+-		printf("zynq_gem init failed!");
+-		return -1;
+-	}
+ 	dev->iobase = EmacPssInstance.Config.BaseAddress;
+ 	dev->priv = &EmacPssInstance;
+ 	dev->init = Xgmac_init;
+@@ -582,13 +642,20 @@ int zynq_gem_initialize_old(bd_t *bis)
+ 	dev->recv = Xgmac_rx;
+ 	dev->write_hwaddr = Xgmac_write_hwaddr;
+ 	priv = dev->priv;
+-	eth_register(dev);
+ 
+ #ifdef CONFIG_PHY_ADDR
+-	priv->phyaddr = CONFIG_PHY_ADDR;
++    priv->phyaddr = CONFIG_PHY_ADDR;
+ #else
+-	priv->phyaddr = -1;
++    priv->phyaddr = -1;
+ #endif
++
++    if (Xgmac_one_time_init() < 0) {
++        printf("zynq_gem init failed!");
++        return -1;
++    }
++
++	eth_register(dev);
++
+ 	phy_detection(dev);
+ 
+ #if defined(CONFIG_CMD_MII) && !defined(CONFIG_BITBANGMII)
+@@ -768,7 +835,9 @@ void Xgmac_set_eth_advertise(XEmacPss *EmacPssInstancePtr, int link_speed)
+ 	XEmacPss_WriteReg(EmacPssInstancePtr->Config.BaseAddress,
+ 			  XEMACPSS_NWCFG_OFFSET, tmp);
+ 
++#ifndef CONFIG_ZX3_PM3	/* Please define the specific board / PHY !!! */
+ 	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
++#endif
+ 
+ 	/* Auto-negotiation advertisement register */
+ 	tmp = phy_rd(EmacPssInstancePtr, 4);
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 2ae7040..68f8fd1 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -25,9 +25,16 @@
+ 
+ #define CONFIG_ZYNQ_SERIAL_UART1
+ 
+-#define CONFIG_ZYNQ_GEM0
+-#define CONFIG_PHY_MICREL
+-#define CONFIG_PHY_ADDR 3
++//#define CONFIG_ZYNQ_GEM0
++//#define CONFIG_PHY_MICREL
++//#define CONFIG_PHY_ADDR 3
++
++#define CONFIG_PHY_ADDR    3
++
++#define CONFIG_ZYNQ_GEM_OLD
++#define CONFIG_XGMAC_PHY_ADDR CONFIG_PHY_ADDR
++#define CONFIG_SYS_ENET
++
+ 
+ #define CONFIG_CMD_NET
+ #define CONFIG_CMD_MII      /* mii utils */
+-- 
+1.7.4.1
+

@@ -8,12 +8,12 @@ inherit deploy
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}"'
 
 python () {
-	if not d.getVar("UBOOT_MACHINE", True):
-		PN = d.getVar("PN", True)
-		FILE = os.path.basename(d.getVar("FILE", True))
-		bb.debug(1, "To build %s, see %s for instructions on \
-			     setting up your machine config" % (PN, FILE))
-		raise bb.parse.SkipPackage("because UBOOT_MACHINE is not set")
+    if not d.getVar("UBOOT_MACHINE", True):
+        PN = d.getVar("PN", True)
+        FILE = os.path.basename(d.getVar("FILE", True))
+        bb.debug(1, "To build %s, see %s for instructions on \
+                 setting up your machine config" % (PN, FILE))
+        raise bb.parse.SkipPackage("because UBOOT_MACHINE is not set")
 }
 
 # Some versions of u-boot use .bin and others use .img.  By default use .bin
@@ -35,15 +35,15 @@ SPL_IMAGE ?= "${SPL_BINARY}-${MACHINE}-${PV}-${PR}"
 SPL_SYMLINK ?= "${SPL_BINARY}-${MACHINE}"
 
 do_compile () {
-	if [ "${@base_contains('DISTRO_FEATURES', 'ld-is-gold', 'ld-is-gold', '', d)}" = "ld-is-gold" ] ; then
-		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' config.mk
-	fi
+    if [ "${@base_contains('DISTRO_FEATURES', 'ld-is-gold', 'ld-is-gold', '', d)}" = "ld-is-gold" ] ; then
+        sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' config.mk
+    fi
 
-	unset LDFLAGS
-	unset CFLAGS
-	unset CPPFLAGS
-	oe_runmake ${UBOOT_MACHINE}
-	oe_runmake ${UBOOT_MAKE_TARGET}
+    unset LDFLAGS
+    unset CFLAGS
+    unset CPPFLAGS
+    oe_runmake ${UBOOT_MACHINE}
+    oe_runmake ${UBOOT_MAKE_TARGET}
 }
 
 do_install () {
