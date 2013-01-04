@@ -1,0 +1,30 @@
+From 5746c29cdaa2aefc2e5f239f06adadcf64f9a156 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Fri, 4 Jan 2013 15:07:11 +0100
+Subject: [PATCH 15/16] ARM: xilinx: BSP: only board EEPROM for Z4E
+
+The module EEPROM conflict in address size with
+the base board EEPROM. Additionaly the module
+EEPROM should not be written by the end user
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ include/configs/zynq4ethernet.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/include/configs/zynq4ethernet.h b/include/configs/zynq4ethernet.h
+index 09306ac..dd27934 100644
+--- a/include/configs/zynq4ethernet.h
++++ b/include/configs/zynq4ethernet.h
+@@ -142,7 +142,7 @@
+ #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN			2
+ #define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS		5	/* 5 bits = 32 bytes */
+ #define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	10
+-#define CONFIG_SYS_I2C_MULTI_EEPROMS				/* On module and on board EEPROM */
++#undef  CONFIG_SYS_I2C_MULTI_EEPROMS				/* consider only the board EEPROM */
+ 
+ /**
+  * Environment storage
+-- 
+1.7.4.1
+

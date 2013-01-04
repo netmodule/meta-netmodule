@@ -1,0 +1,112 @@
+From 59defaecc03aabdc2a549e7a849407427a60e7f0 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Fri, 4 Jan 2013 16:38:43 +0100
+Subject: [PATCH 16/16] ARM: xilinx: BSP: I2C support for ZX3-PM3
+
+Add I2C and MAC address setup from EEPROM
+for the Enclustra ZX3-PM3 board
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ board/enclustra/zx3_pm3/board.c |   50 ++++++++++++++++++++++++++++++++++++++-
+ include/configs/zx3_pm3.h       |   21 ++++++++++++++++
+ 2 files changed, 70 insertions(+), 1 deletions(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index 4f6e65e..84c7c07 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -202,11 +202,59 @@ void zx3_set_storage (int store) {
+ }
+ 
+ 
+-
+ #ifdef CONFIG_CMD_NET
++
++#define ZX3_SHA_EEPROM_ADDR     (0x5C)
++#define ZX3_SHA_EEPROM_ADDR_LEN (0x01)
++#define ZX3_SHA_EEPROM_MAC_OFFSET (0x10)
++
++/**
++ * Read the MAC address in the module EEPROM
++ */
++int zx3_read_mac_address(uint8_t *buf, uint8_t index)
++{
++	/* we have only two interfaces */
++	if (index > 1)
++	return 0;
++
++	/* Read MAC address. */
++	if (i2c_read(ZX3_SHA_EEPROM_ADDR, ZX3_SHA_EEPROM_MAC_OFFSET,
++					ZX3_SHA_EEPROM_ADDR_LEN, (uint8_t *) &buf[0], 6) == 0) {
++
++		/* only the MAC 0 is stored, but the second is reserved, so add index value */
++		buf[5] += index;
++
++		/* Check that MAC address is valid. */
++		if (is_valid_ether_addr(buf)) {
++			return 1; /* Found */
++		}
++		else {
++			printf ("Invalid MAC stored in EEPROM for interface %d\n", index);
++			return 0;
++		}
++	}
++	else {
++		printf("Read from Module EEPROM @ 0x%02x failed\n",
++				ZX3_SHA_EEPROM_ADDR);
++		return 0;
++	}
++
++}
++
+ int board_eth_init(bd_t *bis)
+ {
+ 	u32 ret = 0;
++	u_int8_t mac[6];
++
++	if (zx3_read_mac_address (mac, 0)) {
++		int err;
++
++		/* set address env if not already set */
++		err = eth_setenv_enetaddr("ethaddr", mac);
++		if (err)
++			printf("Failed to set MAC address 0 from EEPROM to env.\n");
++	}
++
+ 
+ #ifdef CONFIG_XILINX_AXIEMAC
+ 	ret |= xilinx_axiemac_initialize(bis, XILINX_AXIEMAC_BASEADDR,
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 68f8fd1..058d5bb 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -130,4 +130,25 @@
+ #undef CONFIG_SYS_PROMPT
+ #define CONFIG_SYS_PROMPT   "zx3-uboot> "
+ 
++/**
++ * I2C support
++ */
++#define CONFIG_ZYNQ_I2C						/* Support for Zynq I2C */
++#define CONFIG_HARD_I2C						/* I2C with hardware support */
++#define CONFIG_ZYNQ_I2C_CTLR_0				/* Enable I2C_0 */
++#define CONFIG_SYS_I2C_SPEED		100000	/* I2C speed and slave address */
++
++#define CONFIG_CMD_I2C
++
++/**
++ * I2C EEPROM
++ */
++#define CONFIG_CMD_EEPROM
++#define CONFIG_SYS_I2C_EEPROM_ADDR				0x54
++#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN			2
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS		6	/* 5 bits = 32 bytes */
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	10
++#undef  CONFIG_SYS_I2C_MULTI_EEPROMS				/* consider only the board EEPROM */
++
++
+ #endif /* __CONFIG_ZYNQ4ETHERNET_H */
+-- 
+1.7.4.1
+

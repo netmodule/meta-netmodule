@@ -22,6 +22,10 @@ SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch  
                     file://0010-ARM-xilinx-BSP-UBI-layer.patch \
                     file://0011-ARM-xilinx-BSP-UBI-support-for-ZX3_PM3.patch \
                     file://0012-ARM-xilinx-BSP-use-legacy-ETH-driver-for-ZX3_PM3.patch \
+                    file://0013-ARM-xilinx-BSP-Z4E-gets-MAC-addr-from-EERPOM.patch \
+                    file://0014-ARM-xilinx-BSP-fix-return-value-in-pin-muxing.patch \
+                    file://0015-ARM-xilinx-BSP-only-board-EEPROM-for-Z4E.patch \
+                    file://0016-ARM-xilinx-BSP-I2C-support-for-ZX3-PM3.patch \
                   "
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 
