@@ -26,8 +26,11 @@ SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch  
                     file://0014-ARM-xilinx-BSP-fix-return-value-in-pin-muxing.patch \
                     file://0015-ARM-xilinx-BSP-only-board-EEPROM-for-Z4E.patch \
                     file://0016-ARM-xilinx-BSP-I2C-support-for-ZX3-PM3.patch \
+                    file://0017-zynq-BSP-support-for-ZX3_Starter-board.patch \
                   "
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
+
+UBOOT_MACHINE_zynq-zx3-starter = "zx3_starter"
 
 UBOOT_MACHINE_zynq-z4e = "zynq4ethernet"
                        
