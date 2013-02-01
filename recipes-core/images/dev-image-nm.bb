@@ -23,6 +23,7 @@ IMAGE_INSTALL += "packagegroup-core-boot \
                 sysstat \
                 apt \
                 openssh-sftp-server \
+                net-snmp-server \
                 ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
                 ${CORE_IMAGE_EXTRA_INSTALL} \
                 "
