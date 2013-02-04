@@ -1,7 +1,7 @@
 From f2d14163fb12df8a81623191bd2495b6f09f5d52 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 4 Jan 2013 14:34:34 +0100
-Subject: [PATCH 14/16] ARM: xilinx: BSP: fix return value in pin muxing
+Subject: [PATCH 14/20] ARM: xilinx: BSP: fix return value in pin muxing
 
 Fix the return value warning in the pin muxing
 function for NAND and QSPI

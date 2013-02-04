@@ -1,15 +1,13 @@
-From 2f8f72475ffcf1eac392565bfe8faf9277d86f86 Mon Sep 17 00:00:00 2001
-From: David Andrey <david.andrey@netmodule.com>
-Date: Thu, 20 Dec 2012 11:48:13 +0100
-Subject: [PATCH 12/12] ARM: xilinx: BSP: add dts and kernel config for ZX3_Starter
+From 06cf776e4d906d0bef98ec7cfc32775174493e85 Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Wed, 9 Jan 2013 13:52:00 +0100
+Subject: [PATCH 16/16] ARM: xilinx: BSP: add dts and kernel config for ZX3_Starter
 
 Add own DTS file and kernel configuration for the
 Enclustra ZX3_Starter board
-
-Signed-off-by:David Andrey david.andrey@netmodule.com
 ---
- arch/arm/boot/dts/zynq-zx3-starter.dts           |  194 +++
- arch/arm/configs/enclustra_zx3_starter_defconfig | 2058 ++++++++++++++++++++++++++
+ arch/arm/boot/dts/zynq-zx3-starter.dts           |  194 ++
+ arch/arm/configs/enclustra_zx3_starter_defconfig | 2058 ++++++++++++++++++++++
  2 files changed, 2252 insertions(+), 0 deletions(-)
  create mode 100644 arch/arm/boot/dts/zynq-zx3-starter.dts
  create mode 100644 arch/arm/configs/enclustra_zx3_starter_defconfig

@@ -1,7 +1,7 @@
-From aa0195333a1286e03cad642d32cdaa24f74a54e5 Mon Sep 17 00:00:00 2001
+From b8679efebb0cf38ccdc790f5ee31c391544ce95a Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 18 Dec 2012 07:21:43 +0100
-Subject: [PATCH 10/12] ARM: xilinx: BSP: UBI layer
+Subject: [PATCH 10/20] ARM: xilinx: BSP: UBI layer
 
 Add UBI support and use it for kernel and DTB storage
 

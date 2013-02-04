@@ -1,7 +1,7 @@
 From 2dba93b2ee34e0589f54ed341e4aa58d77447ef6 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Mon, 26 Nov 2012 16:04:47 +0100
-Subject: [PATCH 05/12] ARM: xilinx: Micrel PHY: added support for KSZ9031
+Subject: [PATCH 05/16] ARM: xilinx: Micrel PHY: added support for KSZ9031
 
 Added the KSZ91 PHY in the Micrel PHY driveeer
 

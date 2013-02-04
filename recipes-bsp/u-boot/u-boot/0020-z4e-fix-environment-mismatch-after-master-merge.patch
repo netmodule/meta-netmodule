@@ -1,0 +1,32 @@
+From 73c43a75b8d561b0f67a7945dd0c53eae8b6700e Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Mon, 4 Feb 2013 14:31:50 +0100
+Subject: [PATCH 20/20] z4e: fix environment mismatch after master merge
+
+Environment was expected in QSPI Flash after
+merge with master branch. Set to EEPROM again
+
+Signed-off-by: David Andrey david.andrey@netmodule.com
+---
+ include/configs/zynq4ethernet.h |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/include/configs/zynq4ethernet.h b/include/configs/zynq4ethernet.h
+index 2e3ce3c..c21bf5e 100644
+--- a/include/configs/zynq4ethernet.h
++++ b/include/configs/zynq4ethernet.h
+@@ -149,7 +149,11 @@
+  * Environment storage
+  */
+ #undef CONFIG_ENV_IS_NOWHERE				/* common expect env. in NOR or nowhere */
++#undef CONFIG_ENV_IS_IN_SPI_FLASH
++#undef CONFIG_ENV_IS_IN_NAND
+ #undef CONFIG_ENV_SIZE
++#undef CONFIG_ENV_OFFSET
++
+ #define CONFIG_ENV_IS_IN_EEPROM
+ #define CONFIG_ENV_OFFSET			2048	/* environment starts here     */
+ #define CONFIG_ENV_SIZE				2048
+-- 
+1.7.4.1
+

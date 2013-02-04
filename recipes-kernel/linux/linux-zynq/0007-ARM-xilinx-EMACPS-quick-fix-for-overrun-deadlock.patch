@@ -1,7 +1,7 @@
 From d5a08c16606a0a9422abf099eeb2c9846af370b0 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 28 Nov 2012 17:33:47 +0100
-Subject: [PATCH 07/12] ARM: xilinx: EMACPS: quick fix for overrun deadlock
+Subject: [PATCH 07/16] ARM: xilinx: EMACPS: quick fix for overrun deadlock
 
 RX patch was frozen if no new frame was detected and the
 BDRing was full

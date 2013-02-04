@@ -1,7 +1,7 @@
 From f3fa200e88d1cd731d833c6150690d30b372a893 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 16 Nov 2012 13:33:50 +0100
-Subject: [PATCH 02/12] ARM: xilinx: GEM1: work-around for missing parent clk
+Subject: [PATCH 02/16] ARM: xilinx: GEM1: work-around for missing parent clk
 
 Parent clock is missing for GEM1, and therefore, the
 link clock is not computed well

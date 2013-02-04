@@ -1,7 +1,7 @@
 From 664ef6eb898a41409fe546a7b9d14cf80a3f0b72 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 14 Dec 2012 15:01:24 +0100
-Subject: [PATCH 10/12] ARM: xilinx: BSP: change PHY addr for Z4E
+Subject: [PATCH 10/16] ARM: xilinx: BSP: change PHY addr for Z4E
 
 PHY address for ETH1 on Zynq4Ethernet changed to 4
 

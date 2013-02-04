@@ -1,23 +1,20 @@
-From 13c6fc0565bb631bd3dd993f176da80ddb26aa2f Mon Sep 17 00:00:00 2001
-From: David Andrey <david.andrey@netmodule.com>
-Date: Fri, 7 Dec 2012 12:13:27 +0100
-Subject: [PATCH 02/10] zynq: BSP: support for ZX3_Starter board
+From bc0b76982894b3909fb1c4338ad05644537f8c93 Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Wed, 9 Jan 2013 13:52:51 +0100
+Subject: [PATCH 19/20] zynq: BSP: support for ZX3_Starter board
 
 Added basic support for Enclustra ZX3 Mars Starter board
-
-Signed-off-by:David Andrey david.andrey@netmodule.com
 ---
- board/enclustra/zx3_starter/Makefile        |   56 ++++++
- board/enclustra/zx3_starter/board.c         |  290 +++++++++++++++++++++++++++++++
- board/enclustra/zx3_starter/lowlevel_init.S |  198 +++++++++++++++++++++
+ board/enclustra/zx3_starter/Makefile        |   56 +++++
+ board/enclustra/zx3_starter/board.c         |  290 +++++++++++++++++++++++++++
+ board/enclustra/zx3_starter/lowlevel_init.S |  198 ++++++++++++++++++
  boards.cfg                                  |    1 +
- include/configs/zx3_starter.h               |  110 ++++++++++++
  common/cmd_nand.c                           |    2 +-
  common/cmd_sf.c                             |    2 +-
- drivers/net/zynq_gem_wrap.c                 |   16 +++++++----
- include/configs/zx3_pm3.h                   |    6 ++--
- include/configs/zx3_starter.h               |   62 +++++++++++++++++++++++++++++++++++------
- 10 files changed, 723 insertions(+), 20 deletions(-)
+ drivers/net/zynq_gem_wrap.c                 |   16 +-
+ include/configs/zx3_pm3.h                   |    6 +-
+ include/configs/zx3_starter.h               |  154 ++++++++++++++
+ 9 files changed, 714 insertions(+), 11 deletions(-)
  create mode 100644 board/enclustra/zx3_starter/Makefile
  create mode 100644 board/enclustra/zx3_starter/board.c
  create mode 100644 board/enclustra/zx3_starter/lowlevel_init.S
@@ -586,134 +583,17 @@ index 0000000..3524f1f
 +	mov pc, lr
 +
 diff --git a/boards.cfg b/boards.cfg
-index 2382d29..adca12c 100644
+index adca12c..bcd7c9f 100644
 --- a/boards.cfg
 +++ b/boards.cfg
-@@ -279,6 +279,7 @@ zynq_zc70x                   arm         armv7       zynq                xilinx
- zynq_cseflash                arm         armv7       zynq                xilinx         zynq
+@@ -280,6 +280,7 @@ zynq_cseflash                arm         armv7       zynq                xilinx
  zynq_zed                     arm         armv7       zynq                xilinx         zynq
  zynq4ethernet                arm         armv7       zynq4ethernet       netmodule      zynq
  zx3_pm3                      arm         armv7       zx3_pm3             enclustra      zynq
 +zx3_starter                  arm         armv7       zx3_starter         enclustra      zynq
  omap5_evm                    arm         armv7       omap5_evm           ti		omap5
  s5p_goni                     arm         armv7       goni                samsung        s5pc1xx
-diff --git a/include/configs/zx3_starter.h b/include/configs/zx3_starter.h
-new file mode 100644
-index 0000000..9d187af
---- /dev/null
-+++ b/include/configs/zx3_starter.h
-@@ -0,0 +1,110 @@
-+/*
-+ * (C) Copyright 2012 Xilinx
-+ * (C) Copyright 2012 NetModule
-+ *
-+ * Configuration for Enclustra Zynq Mars Board - ZX3-Starter
-+ * See zynq_common.h for Zynq common configs
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 of
-+ * the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-+ * MA 02111-1307 USA
-+ */
-+
-+#ifndef __CONFIG_ZYNQ4ETHERNET_H
-+#define __CONFIG_ZYNQ4ETHERNET_H
-+
-+#define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
-+
-+#define CONFIG_ZYNQ_SERIAL_UART1
-+
-+#define CONFIG_ZYNQ_GEM0
-+#define CONFIG_PHY_MICREL
-+#define CONFIG_PHY_ADDR 3
-+
-+#define CONFIG_CMD_NET
-+#define CONFIG_CMD_MII      /* mii utils */
-+
-+#define CONFIG_SYS_NO_FLASH
-+
-+#define CONFIG_ZYNQ_SPI
-+#define CONFIG_NAND_ZYNQ
-+
-+#include <configs/zynq_common.h>
-+
-+#undef CONFIG_EXTRA_ENV_SETTINGS
-+#define CONFIG_EXTRA_ENV_SETTINGS   \
-+    "ethaddr=00:0a:35:00:01:22\0"   \
-+    "kernel_image=uImage\0" \
-+    "ramdisk_image=uramdisk.image.gz\0" \
-+    "devicetree_image=devicetree.dtb\0" \
-+    "kernel_size=0x2E0000\0"    \
-+    "ramdisk_size=0x600000\0"   \
-+    "devicetree_size=0x10000\0" \
-+    "nand_kernel_size=0x2E0000\0"   \
-+    "nand_devicetree_size=0x10000\0" \
-+    "fdt_high=0x20000000\0" \
-+    "initrd_high=0x20000000\0"  \
-+    "nandargs=setenv bootargs console=ttyPS0,115200 " \
-+        "root=ubi0:ubi-rootfs rw " \
-+        "rootfstype=ubifs " \
-+        "ubi.mtd=nand-rootfs " \
-+        "ip=:::::eth0:off " \
-+        "$othbootargs " \
-+        "earlyprintk\0" \
-+    "ramargs=setenv bootargs console=ttyPS0,115200 " \
-+        "root=/dev/ram rw " \
-+        "ip=:::::eth0:off " \
-+        "$othbootargs " \
-+        "earlyprintk\0" \
-+    "prodboot=echo Booting on NAND...;" \
-+        "nand read 0x3000000 0x000000 ${nand_kernel_size};" \
-+        "nand read 0x2A00000 0x500000 ${nand_devicetree_size};" \
-+        "run nandargs;" \
-+        "bootm 0x3000000 - 0x2A00000\0" \
-+    "rescboot=echo Booting on QSPI Flash...;" \
-+        "sf probe;" \
-+        "sf read 0x3000000 0x600000 ${kernel_size};" \
-+        "sf read 0x2A00000 0x900000 ${devicetree_size};" \
-+        "sf read 0x2000000 0xA00000 ${ramdisk_size};" \
-+        "nand device 0;" \
-+        "run ramargs;" \
-+        "bootm 0x3000000 0x2000000 0x2A00000;\0" \
-+    "jtagboot=echo Booting on TFTP...;" \
-+        "tftp 0x3000000 ${kernel_image};" \
-+        "tftp 0x2A00000 ${devicetree_image};" \
-+        "tftp 0x2000000 ${ramdisk_image};" \
-+        "run ramargs;" \
-+        "bootm 0x3000000 0x2000000 0x2A00000\0" \
-+    "modeboot=run prodboot\0"
-+
-+
-+#undef CONFIG_BOOTDELAY
-+#define CONFIG_BOOTDELAY    -1 /* -1 to Disable autoboot */
-+
-+#define CONFIG_SYS_LONGHELP     /* undef to save memory */
-+
-+#define CONFIG_ENV_OVERWRITE
-+
-+#undef CONFIG_SYS_MAXARGS
-+#define CONFIG_SYS_MAXARGS 32
-+
-+#define ZX3_NONE    (0)
-+#define ZX3_NAND    (1)
-+#define ZX3_QSPI    (2)
-+
-+#undef CONFIG_ZYNQ_SERIAL_CLOCK1
-+#define CONFIG_ZYNQ_SERIAL_CLOCK1 0x5f5e100
-+
-+#undef CONFIG_IPADDR
-+#undef CONFIG_SERVERIP
-+
-+#undef CONFIG_SYS_PROMPT
-+#define CONFIG_SYS_PROMPT   "zx3-uboot> "
-+
-+#endif /* __CONFIG_ZYNQ4ETHERNET_H */
-
+ smdkc100                     arm         armv7       smdkc100            samsung        s5pc1xx
 diff --git a/common/cmd_nand.c b/common/cmd_nand.c
 index c1cda50..9bd46f3 100644
 --- a/common/cmd_nand.c
@@ -741,7 +621,7 @@ index 8ea2cde..627d9ce 100644
  #endif
  
 diff --git a/drivers/net/zynq_gem_wrap.c b/drivers/net/zynq_gem_wrap.c
-index 7669cdf..fba1381 100644
+index 7669cdf..fba1381 100755
 --- a/drivers/net/zynq_gem_wrap.c
 +++ b/drivers/net/zynq_gem_wrap.c
 @@ -249,7 +249,7 @@ int Xgmac_one_time_init(void)
@@ -824,36 +704,38 @@ index 058d5bb..6834be1 100644
 -#endif /* __CONFIG_ZYNQ4ETHERNET_H */
 +#endif /* __CONFIG_ZX3_PM*_H */
 diff --git a/include/configs/zx3_starter.h b/include/configs/zx3_starter.h
-index ad33f52..0130f24 100644
---- a/include/configs/zx3_starter.h
+new file mode 100644
+index 0000000..0130f24
+--- /dev/null
 +++ b/include/configs/zx3_starter.h
-@@ -2,7 +2,7 @@
-  * (C) Copyright 2012 Xilinx
-  * (C) Copyright 2012 NetModule
-  *
-- * Configuration for Enclustra Zynq Mars Board - ZX3-Starter
+@@ -0,0 +1,154 @@
++/*
++ * (C) Copyright 2012 Xilinx
++ * (C) Copyright 2012 NetModule
++ *
 + * Configuration for Enclustra Zynq Mars Board - ZX3-STARTER
-  * See zynq_common.h for Zynq common configs
-  *
-  * This program is free software; you can redistribute it and/or
-@@ -16,16 +16,25 @@
-  * MA 02111-1307 USA
-  */
- 
--#ifndef __CONFIG_ZYNQ4ETHERNET_H
--#define __CONFIG_ZYNQ4ETHERNET_H
++ * See zynq_common.h for Zynq common configs
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of
++ * the License, or (at your option) any later version.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
++ * MA 02111-1307 USA
++ */
++
 +#ifndef __CONFIG_ZX3_STARTER_H
 +#define __CONFIG_ZX3_STARTER_H
 +
 +#define CONFIG_ZX3_STARTER /* ZX3 STARTER Board */
- 
- #define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
- 
- #define CONFIG_ZYNQ_SERIAL_UART1
- 
--#define CONFIG_ZYNQ_GEM0
--#define CONFIG_PHY_MICREL
--#define CONFIG_PHY_ADDR 3
++
++#define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
++
++#define CONFIG_ZYNQ_SERIAL_UART1
++
 +//#define CONFIG_ZYNQ_GEM0
 +//#define CONFIG_PHY_MICREL
 +//#define CONFIG_PHY_ADDR 3
@@ -864,13 +746,15 @@ index ad33f52..0130f24 100644
 +#define CONFIG_XGMAC_PHY_ADDR CONFIG_PHY_ADDR
 +#define CONFIG_SYS_ENET
 +
- 
- #define CONFIG_CMD_NET
- #define CONFIG_CMD_MII      /* mii utils */
-@@ -35,6 +44,16 @@
- #define CONFIG_ZYNQ_SPI
- #define CONFIG_NAND_ZYNQ
- 
++
++#define CONFIG_CMD_NET
++#define CONFIG_CMD_MII      /* mii utils */
++
++#define CONFIG_SYS_NO_FLASH
++
++#define CONFIG_ZYNQ_SPI
++#define CONFIG_NAND_ZYNQ
++
 +#define CONFIG_CMD_MTDPARTS
 +#define CONFIG_MTD_PARTITIONS
 +#define CONFIG_RBTREE
@@ -881,36 +765,82 @@ index ad33f52..0130f24 100644
 +                    "1m(nand-device-tree),-(nand-rootfs)"
 +
 +
- #include <configs/zynq_common.h>
- 
- #undef CONFIG_EXTRA_ENV_SETTINGS
-@@ -50,6 +69,8 @@
-     "nand_devicetree_size=0x10000\0" \
-     "fdt_high=0x20000000\0" \
-     "initrd_high=0x20000000\0"  \
++#include <configs/zynq_common.h>
++
++#undef CONFIG_EXTRA_ENV_SETTINGS
++#define CONFIG_EXTRA_ENV_SETTINGS   \
++    "ethaddr=00:0a:35:00:01:22\0"   \
++    "kernel_image=uImage\0" \
++    "ramdisk_image=uramdisk.image.gz\0" \
++    "devicetree_image=devicetree.dtb\0" \
++    "kernel_size=0x2E0000\0"    \
++    "ramdisk_size=0x600000\0"   \
++    "devicetree_size=0x10000\0" \
++    "nand_kernel_size=0x2E0000\0"   \
++    "nand_devicetree_size=0x10000\0" \
++    "fdt_high=0x20000000\0" \
++    "initrd_high=0x20000000\0"  \
 +    "mtdids=" MTDIDS_DEFAULT "\0"    \
 +    "mtdparts=" MTDPARTS_DEFAULT "\0" \
-     "nandargs=setenv bootargs console=ttyPS0,115200 " \
-         "root=ubi0:ubi-rootfs rw " \
-         "rootfstype=ubifs " \
-@@ -63,8 +84,10 @@
-         "$othbootargs " \
-         "earlyprintk\0" \
-     "prodboot=echo Booting on NAND...;" \
--        "nand read 0x3000000 0x000000 ${nand_kernel_size};" \
--        "nand read 0x2A00000 0x500000 ${nand_devicetree_size};" \
++    "nandargs=setenv bootargs console=ttyPS0,115200 " \
++        "root=ubi0:ubi-rootfs rw " \
++        "rootfstype=ubifs " \
++        "ubi.mtd=nand-rootfs " \
++        "ip=:::::eth0:off " \
++        "$othbootargs " \
++        "earlyprintk\0" \
++    "ramargs=setenv bootargs console=ttyPS0,115200 " \
++        "root=/dev/ram rw " \
++        "ip=:::::eth0:off " \
++        "$othbootargs " \
++        "earlyprintk\0" \
++    "prodboot=echo Booting on NAND...;" \
 +        "ubi part nand-linux;" \
 +        "ubi read 0x3000000 kernel ${nand_kernel_size};" \
 +        "ubi part nand-device-tree;" \
 +        "ubi read 0x2A00000 dtb ${nand_devicetree_size};" \
-         "run nandargs;" \
-         "bootm 0x3000000 - 0x2A00000\0" \
-     "rescboot=echo Booting on QSPI Flash...;" \
-@@ -107,4 +130,25 @@
- #undef CONFIG_SYS_PROMPT
- #define CONFIG_SYS_PROMPT   "zx3-uboot> "
- 
--#endif /* __CONFIG_ZYNQ4ETHERNET_H */
++        "run nandargs;" \
++        "bootm 0x3000000 - 0x2A00000\0" \
++    "rescboot=echo Booting on QSPI Flash...;" \
++        "sf probe;" \
++        "sf read 0x3000000 0x600000 ${kernel_size};" \
++        "sf read 0x2A00000 0x900000 ${devicetree_size};" \
++        "sf read 0x2000000 0xA00000 ${ramdisk_size};" \
++        "nand device 0;" \
++        "run ramargs;" \
++        "bootm 0x3000000 0x2000000 0x2A00000;\0" \
++    "jtagboot=echo Booting on TFTP...;" \
++        "tftp 0x3000000 ${kernel_image};" \
++        "tftp 0x2A00000 ${devicetree_image};" \
++        "tftp 0x2000000 ${ramdisk_image};" \
++        "run ramargs;" \
++        "bootm 0x3000000 0x2000000 0x2A00000\0" \
++    "modeboot=run prodboot\0"
++
++
++#undef CONFIG_BOOTDELAY
++#define CONFIG_BOOTDELAY    -1 /* -1 to Disable autoboot */
++
++#define CONFIG_SYS_LONGHELP     /* undef to save memory */
++
++#define CONFIG_ENV_OVERWRITE
++
++#undef CONFIG_SYS_MAXARGS
++#define CONFIG_SYS_MAXARGS 32
++
++#define ZX3_NONE    (0)
++#define ZX3_NAND    (1)
++#define ZX3_QSPI    (2)
++
++#undef CONFIG_ZYNQ_SERIAL_CLOCK1
++#define CONFIG_ZYNQ_SERIAL_CLOCK1 0x5f5e100
++
++#undef CONFIG_IPADDR
++#undef CONFIG_SERVERIP
++
++#undef CONFIG_SYS_PROMPT
++#define CONFIG_SYS_PROMPT   "zx3-uboot> "
++
 +/**
 + * I2C support
 + */
@@ -934,6 +864,5 @@ index ad33f52..0130f24 100644
 +
 +#endif /* __CONFIG_ZX3_STARTER_H */
 -- 
-1.7.10.4
-
+1.7.4.1
 

@@ -31,28 +31,30 @@ KERNEL_DEFCONFIG_zynq-z4e = "netmodule_z4e_defconfig"
 # make configuration dependent of machine
 FILESEXTRAPATHS_prepend := "${THISDIR}/${P}/${MACHINE}:"
 
-SRC_URI_append = 	" \
-				  	file://0001-ARM-xilinx-BSP-Support-for-Z4E-Board.patch \
-					file://0002-ARM-xilinx-GEM1-work-around-for-missing-parent-clk.patch \
-					file://0003-ARM-xilinx-BSP-avoid-phy-driver-overwriting-bootload.patch \
-					file://0004-ARM-xilinx-BSP-setup-LED-for-Z4E-iMarvell-PHY.patch \
-					file://0005-ARM-xilinx-Micrel-PHY-added-support-for-KSZ9031.patch \
-					file://0006-ARM-xilinx-Micrel-PHY-disabled-PAUSE.patch \
-					file://0007-ARM-xilinx-EMACPS-quick-fix-for-overrun-deadlock.patch \
-					file://0008-ARM-xilinx-BSP-Z4E-default-configuration.patch \
-					file://0009-ARM-xilinx-Micrel-PHY-disabled-PAUSE.patch \
-					file://0010-ARM-xilinx-BSP-change-PHY-addr-for-Z4E.patch \
-					file://0011-ARM-xilinx-BSP-new-kernel-config-for-Z4E.patch \
-					file://0012-ARM-xilinx-BSP-add-dts-and-kernel-config-for-ZX3_PM3.patch \
-					file://0013-ARM-xilinx-BSP-add-dts-and-kernel-config-for-ZX3_Starter.patch \
-					file://defconfig \
-					"
-					
+SRC_URI_append = " file://0001-ARM-xilinx-BSP-Support-for-Z4E-Board.patch                 \
+                   file://0002-ARM-xilinx-GEM1-work-around-for-missing-parent-clk.patch   \
+                   file://0003-ARM-xilinx-BSP-avoid-phy-driver-overwriting-bootload.patch \
+                   file://0004-ARM-xilinx-BSP-setup-LED-for-Z4E-iMarvell-PHY.patch        \
+                   file://0005-ARM-xilinx-Micrel-PHY-added-support-for-KSZ9031.patch      \
+                   file://0006-ARM-xilinx-Micrel-PHY-disabled-PAUSE.patch                 \
+                   file://0007-ARM-xilinx-EMACPS-quick-fix-for-overrun-deadlock.patch     \
+                   file://0008-ARM-xilinx-BSP-Z4E-default-configuration.patch             \
+                   file://0009-ARM-xilinx-Micrel-PHY-disabled-PAUSE.patch                 \
+                   file://0010-ARM-xilinx-BSP-change-PHY-addr-for-Z4E.patch               \
+                   file://0011-ARM-xilinx-BSP-new-kernel-config-for-Z4E.patch             \
+                   file://0012-ARM-xilinx-BSP-add-dts-and-kernel-config-for-ZX3_PM3.patch \
+                   file://0013-ARM-xilinx-BSP-fix-eth0-skew.patch                         \
+                   file://0014-ARM-xilinx-BSP-Z4E-max-size-for-last-MTD.patch             \
+                   file://0015-ARM-xilinx-BSP-remove-eth1-for-ZX3-PM3.patch               \
+                   file://0016-ARM-xilinx-BSP-add-dts-and-kernel-config-for-ZX3_Sta.patch \
+                   file://defconfig \
+                  "
+
 S = "${WORKDIR}/git"
 
 #If a KERNEL_DEFCONFIG is specified, the defconfig specified in SRC_URI will be overwritten!
 do_configure_append(){
-	if [ "${KERNEL_DEFCONFIG}" != "" ]; then
-		oe_runmake ${KERNEL_DEFCONFIG}
-	fi
+    if [ "${KERNEL_DEFCONFIG}" != "" ]; then
+        oe_runmake ${KERNEL_DEFCONFIG}
+    fi
 }

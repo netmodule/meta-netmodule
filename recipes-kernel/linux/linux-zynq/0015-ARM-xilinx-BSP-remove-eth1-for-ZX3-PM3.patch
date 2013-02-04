@@ -1,0 +1,43 @@
+From d0c8de4f0a501f871ebcaab4ab260c14961e1b29 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 23 Jan 2013 13:02:00 +0100
+Subject: [PATCH 15/16] ARM: xilinx: BSP: remove eth1 for ZX3-PM3
+
+There is only one Ethernet interface for the
+Enclustra ZX3-PM3 board
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ arch/arm/boot/dts/zynq-zx3-pm3.dts |   16 ----------------
+ 1 files changed, 0 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm/boot/dts/zynq-zx3-pm3.dts b/arch/arm/boot/dts/zynq-zx3-pm3.dts
+index 95559a3..1732852 100644
+--- a/arch/arm/boot/dts/zynq-zx3-pm3.dts
++++ b/arch/arm/boot/dts/zynq-zx3-pm3.dts
+@@ -99,22 +99,6 @@
+ 			};
+ 		};
+ 		
+-		eth1: eth@e000c000 {
+-			#address-cells = <0x1>;
+-			#size-cells = <0x0>;
+-			compatible = "xlnx,ps7-ethernet-1.00.a";
+-			reg = <0xE000C000 0x1000>;
+-			interrupt-parent = <&gic>;
+-			interrupts = <0 45 0>;
+-			phy-handle = <&phy1>;
+-			
+-			phy1: phy@7 {
+-				compatible = "marvell,88e1118";
+-				device_type = "ethernet-phy";
+-				reg = <7>;
+-			} ;
+-		};
+-
+ 		slcr@f8000000 {
+ 			compatible = "xlnx,ps7-slcr-1.00.a";
+ 			reg = <0xf8000000 0x1000>;
+-- 
+1.7.4.1
+

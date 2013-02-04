@@ -8,25 +8,28 @@ PR = "r1"
 
 PV  = "2012.04+xilinx-git" 
 SRC_URI = "git://git.xilinx.com/u-boot-xlnx.git"
-SRCREV = "22bea29ac2373de3718a4dfe4a1e85161392182d"
+SRCREV = "26786228acfdc0a02190a8d9ca9fcca51a5dcf28"
 
-SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch  \
-                    file://0002-zynq-BSP-support-for-ZX3_PM3-board.patch \
-                    file://0003-zynq-BSP-QSPI-Flash-and-NAND-muxing.patch \
-                    file://0004-ARM-xilinx-U-Boot-udelay-1000-FIX.patch \
-                    file://0005-ARM-zynq-I2C-check-for-transfert-size.patch \ 
-                    file://0006-ARM-zynq-I2C-optimize-wait-delay.patch \
-                    file://0007-ARM-zynq-I2C-verification-needed.patch \
-                    file://0008-ARM-zynq-BSP-add-I2C-for-Z4E-board.patch \ 
-                    file://0009-ARM-xilinx-BSP-auto-boot-for-Z4E.patch \
-                    file://0010-ARM-xilinx-BSP-UBI-layer.patch \
-                    file://0011-ARM-xilinx-BSP-UBI-support-for-ZX3_PM3.patch \
+SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch         \
+                    file://0002-zynq-BSP-support-for-ZX3_PM3-board.patch               \
+                    file://0003-zynq-BSP-QSPI-Flash-and-NAND-muxing.patch              \
+                    file://0004-ARM-xilinx-U-Boot-udelay-1000-FIX.patch                \
+                    file://0005-ARM-zynq-I2C-check-for-transfert-size.patch            \
+                    file://0006-ARM-zynq-I2C-optimize-wait-delay.patch                 \
+                    file://0007-ARM-zynq-I2C-verification-needed.patch                 \
+                    file://0008-ARM-zynq-BSP-add-I2C-for-Z4E-board.patch               \
+                    file://0009-ARM-xilinx-BSP-auto-boot-for-Z4E.patch                 \
+                    file://0010-ARM-xilinx-BSP-UBI-layer.patch                         \
+                    file://0011-ARM-xilinx-BSP-UBI-support-for-ZX3_PM3.patch           \
                     file://0012-ARM-xilinx-BSP-use-legacy-ETH-driver-for-ZX3_PM3.patch \
-                    file://0013-ARM-xilinx-BSP-Z4E-gets-MAC-addr-from-EERPOM.patch \
-                    file://0014-ARM-xilinx-BSP-fix-return-value-in-pin-muxing.patch \
-                    file://0015-ARM-xilinx-BSP-only-board-EEPROM-for-Z4E.patch \
-                    file://0016-ARM-xilinx-BSP-I2C-support-for-ZX3-PM3.patch \
-                    file://0017-zynq-BSP-support-for-ZX3_Starter-board.patch \
+                    file://0013-ARM-xilinx-BSP-Z4E-gets-MAC-addr-from-EERPOM.patch     \
+                    file://0014-ARM-xilinx-BSP-fix-return-value-in-pin-muxing.patch    \
+                    file://0015-ARM-xilinx-BSP-only-board-EEPROM-for-Z4E.patch         \
+                    file://0016-ARM-xilinx-BSP-I2C-support-for-ZX3-PM3.patch           \
+                    file://0017-PHY-micrel.c-add-support-for-KSZ9031.patch             \
+                    file://0018-Z4E-add-board-phy-init.patch                           \
+                    file://0019-zynq-BSP-support-for-ZX3_Starter-board.patch           \
+                    file://0020-z4e-fix-environment-mismatch-after-master-merge.patch  \
                   "
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 

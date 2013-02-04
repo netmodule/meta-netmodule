@@ -1,7 +1,7 @@
 From aa047e172d5c8e4c652b45e38edb8317fc4b620f Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Thu, 15 Nov 2012 10:58:22 +0100
-Subject: [PATCH 01/12] ARM: xilinx: BSP: Support for Z4E Board
+Subject: [PATCH 01/16] ARM: xilinx: BSP: Support for Z4E Board
 
 Added device tree and kernel configuration for the
 NetModule Z4E Board
