@@ -1,7 +1,7 @@
 From 360bcbcbe61131f800b33cc910c38ad14193399d Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 7 Dec 2012 16:46:09 +0100
-Subject: [PATCH 04/10]  ARM: xilinx: U-Boot udelay < 1000 FIX
+Subject: [PATCH 04/20]  ARM: xilinx: U-Boot udelay < 1000 FIX
 
 Rework the __udelay function of U-Boot Zynq Arch to handle
 delay < 1000 usec

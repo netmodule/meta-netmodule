@@ -1,25 +1,23 @@
-From aa047e172d5c8e4c652b45e38edb8317fc4b620f Mon Sep 17 00:00:00 2001
-From: David Andrey <david.andrey@netmodule.com>
-Date: Thu, 15 Nov 2012 10:58:22 +0100
-Subject: [PATCH 01/16] ARM: xilinx: BSP: Support for Z4E Board
+From 06cf776e4d906d0bef98ec7cfc32775174493e85 Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Wed, 9 Jan 2013 13:52:00 +0100
+Subject: [PATCH 16/16] ARM: xilinx: BSP: add dts and kernel config for ZX3_Starter
 
-Added device tree and kernel configuration for the
-NetModule Z4E Board
-
-Signed-off-by:David Andrey david.andrey@netmodule.com
+Add own DTS file and kernel configuration for the
+Enclustra ZX3_Starter board
 ---
- arch/arm/boot/dts/zynq-z4e.dts           |  184 +++
- arch/arm/configs/netmodule_z4e_defconfig | 1841 ++++++++++++++++++++++++++++++
- 2 files changed, 2025 insertions(+), 0 deletions(-)
- create mode 100644 arch/arm/boot/dts/zynq-z4e.dts
- create mode 100644 arch/arm/configs/netmodule_z4e_defconfig
+ arch/arm/boot/dts/zynq-zx3-starter.dts           |  194 ++
+ arch/arm/configs/enclustra_zx3_starter_defconfig | 2058 ++++++++++++++++++++++
+ 2 files changed, 2252 insertions(+), 0 deletions(-)
+ create mode 100644 arch/arm/boot/dts/zynq-zx3-starter.dts
+ create mode 100644 arch/arm/configs/enclustra_zx3_starter_defconfig
 
-diff --git a/arch/arm/boot/dts/zynq-z4e.dts b/arch/arm/boot/dts/zynq-z4e.dts
+diff --git a/arch/arm/boot/dts/zynq-zx3-starter.dts b/arch/arm/boot/dts/zynq-zx3-starter.dts
 new file mode 100644
-index 0000000..30cf383
+index 0000000..95559a3
 --- /dev/null
-+++ b/arch/arm/boot/dts/zynq-z4e.dts
-@@ -0,0 +1,184 @@
++++ b/arch/arm/boot/dts/zynq-zx3-starter.dts
+@@ -0,0 +1,194 @@
 +/*
 + *  Copyright (C) 2012 NetModule AG
 + *
@@ -36,7 +34,7 @@ index 0000000..30cf383
 +/dts-v1/;
 +
 +/ {
-+	model = "NetModule Zynq4Ethernet";
++	model = "Enclustra MARS ZX3";
 +	compatible = "xlnx,zynq-zc770";
 +	#address-cells = <0x1>;
 +	#size-cells = <0x1>;
@@ -48,7 +46,7 @@ index 0000000..30cf383
 +	};
 +
 +	chosen {
-+		linux,stdout-path = "@uart0";
++		linux,stdout-path = "@uart1";
 +	};
 +	
 +	soc {
@@ -80,12 +78,12 @@ index 0000000..30cf383
 +			interrupts = <0x0 0x22 0x4>;
 +		};
 +
-+		uart0: uart@e0000000 {
++		uart1: uart@e0001000 {
 +			compatible = "xlnx,ps7-uart-1.00.a";
-+			reg = <0xE0000000 0x1000>;
-+			interrupts = <0 27 0>;
++			reg = <0xe0001000 0x1000>;
++			interrupts = <0x0 0x32 0x0>;
 +			interrupt-parent = <&gic>;
-+			clock = <50000000>;
++			clock = <0x5f5e100>;
 +		};
 +		
 +		timer@0xf8001000 {
@@ -153,16 +151,27 @@ index 0000000..30cf383
 +			#address-cells = <0x1>;
 +			#size-cells = <0x0>;
 +			
-+			board_eeprom@54 {
-+				compatible = "at,24c64";
-+				reg = <0x54>;
-+			};
-+
 +			rtc@6F {
 +				compatible = "isl12022";
 +				reg = <0x6F>;
 +			}; 
 +			
++		};
++
++		usb@e0002000 {
++			compatible = "xlnx,ps7-usb-1.00.a";
++			reg = <0xe0002000 0x1000>;
++			interrupts = <0x0 0x15 0x0>;
++			interrupt-parent = <&gic>;
++			dr_mode = "host";
++			phy_type = "ulpi";
++		};
++
++		gpio@e000a000 {
++			compatible = "xlnx,ps7-gpio-1.00.a";
++			reg = <0xe000a000 0x1000>;
++			interrupts = <0x0 0x14 0x0>;
++			interrupt-parent = <&gic>;
 +		};
 +
 +		nand@e1000000 {
@@ -187,7 +196,6 @@ index 0000000..30cf383
 +			};
 +		};
 +
-+
 +		devcfg@f8007000 {
 +			compatible = "xlnx,ps7-dev-cfg-1.00.a";
 +			reg = <0xf8007000 0x100>;
@@ -204,12 +212,12 @@ index 0000000..30cf383
 +
 +	};
 +};
-diff --git a/arch/arm/configs/netmodule_z4e_defconfig b/arch/arm/configs/netmodule_z4e_defconfig
+diff --git a/arch/arm/configs/enclustra_zx3_starter_defconfig b/arch/arm/configs/enclustra_zx3_starter_defconfig
 new file mode 100644
-index 0000000..65666cf
+index 0000000..fdba742
 --- /dev/null
-+++ b/arch/arm/configs/netmodule_z4e_defconfig
-@@ -0,0 +1,1841 @@
++++ b/arch/arm/configs/enclustra_zx3_starter_defconfig
+@@ -0,0 +1,2058 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm 3.5.0-14.3-build2 Kernel Configuration
@@ -941,6 +949,7 @@ index 0000000..65666cf
 +# CONFIG_MTD_NAND_DOCG4 is not set
 +# CONFIG_MTD_NAND_NANDSIM is not set
 +# CONFIG_MTD_NAND_PLATFORM is not set
++# CONFIG_MTD_ALAUDA is not set
 +CONFIG_MTD_NAND_XILINX_PSS=y
 +# CONFIG_MTD_ONENAND is not set
 +
@@ -977,6 +986,7 @@ index 0000000..65666cf
 +# CONFIG_BLK_DEV_CRYPTOLOOP is not set
 +# CONFIG_BLK_DEV_DRBD is not set
 +# CONFIG_BLK_DEV_NBD is not set
++# CONFIG_BLK_DEV_UB is not set
 +CONFIG_BLK_DEV_RAM=y
 +CONFIG_BLK_DEV_RAM_COUNT=4
 +CONFIG_BLK_DEV_RAM_SIZE=32768
@@ -1153,7 +1163,7 @@ index 0000000..65666cf
 +# CONFIG_NATIONAL_PHY is not set
 +# CONFIG_STE10XP is not set
 +# CONFIG_LSI_ET1011C_PHY is not set
-+# CONFIG_MICREL_PHY is not set
++CONFIG_MICREL_PHY=y
 +# CONFIG_FIXED_PHY is not set
 +CONFIG_MDIO_BITBANG=y
 +# CONFIG_MDIO_GPIO is not set
@@ -1161,6 +1171,16 @@ index 0000000..65666cf
 +# CONFIG_MICREL_KS8995MA is not set
 +# CONFIG_PPP is not set
 +# CONFIG_SLIP is not set
++
++#
++# USB Network Adapters
++#
++# CONFIG_USB_CATC is not set
++# CONFIG_USB_KAWETH is not set
++# CONFIG_USB_PEGASUS is not set
++# CONFIG_USB_RTL8150 is not set
++# CONFIG_USB_USBNET is not set
++# CONFIG_USB_IPHETH is not set
 +# CONFIG_WLAN is not set
 +
 +#
@@ -1306,8 +1326,10 @@ index 0000000..65666cf
 +#
 +# External I2C/SMBus adapter drivers
 +#
++# CONFIG_I2C_DIOLAN_U2C is not set
 +# CONFIG_I2C_PARPORT_LIGHT is not set
 +# CONFIG_I2C_TAOS_EVM is not set
++# CONFIG_I2C_TINY_USB is not set
 +
 +#
 +# Other I2C/SMBus bus drivers
@@ -1418,6 +1440,11 @@ index 0000000..65666cf
 +CONFIG_MPCORE_WATCHDOG=y
 +CONFIG_XILINX_PS_WATCHDOG=y
 +# CONFIG_MAX63XX_WATCHDOG is not set
++
++#
++# USB-based Watchdog Cards
++#
++# CONFIG_USBPCWATCHDOG is not set
 +CONFIG_SSB_POSSIBLE=y
 +
 +#
@@ -1510,10 +1537,208 @@ index 0000000..65666cf
 +#
 +# Special HID drivers
 +#
++# CONFIG_HID_A4TECH is not set
++# CONFIG_HID_ACRUX is not set
++# CONFIG_HID_APPLE is not set
++# CONFIG_HID_AUREAL is not set
++# CONFIG_HID_BELKIN is not set
++# CONFIG_HID_CHERRY is not set
++# CONFIG_HID_CHICONY is not set
++# CONFIG_HID_CYPRESS is not set
++# CONFIG_HID_DRAGONRISE is not set
++# CONFIG_HID_EMS_FF is not set
++# CONFIG_HID_EZKEY is not set
++# CONFIG_HID_HOLTEK is not set
++# CONFIG_HID_KEYTOUCH is not set
++# CONFIG_HID_KYE is not set
++# CONFIG_HID_UCLOGIC is not set
++# CONFIG_HID_WALTOP is not set
++# CONFIG_HID_GYRATION is not set
++# CONFIG_HID_TWINHAN is not set
++# CONFIG_HID_KENSINGTON is not set
++# CONFIG_HID_LCPOWER is not set
++# CONFIG_HID_LOGITECH is not set
++# CONFIG_HID_MICROSOFT is not set
++# CONFIG_HID_MONTEREY is not set
++# CONFIG_HID_MULTITOUCH is not set
++# CONFIG_HID_NTRIG is not set
++# CONFIG_HID_ORTEK is not set
++# CONFIG_HID_PANTHERLORD is not set
++# CONFIG_HID_PETALYNX is not set
++# CONFIG_HID_PICOLCD is not set
++# CONFIG_HID_PRIMAX is not set
++# CONFIG_HID_ROCCAT is not set
++# CONFIG_HID_SAITEK is not set
++# CONFIG_HID_SAMSUNG is not set
++# CONFIG_HID_SONY is not set
++# CONFIG_HID_SPEEDLINK is not set
++# CONFIG_HID_SUNPLUS is not set
++# CONFIG_HID_GREENASIA is not set
++# CONFIG_HID_SMARTJOYPLUS is not set
++# CONFIG_HID_TIVO is not set
++# CONFIG_HID_TOPSEED is not set
++# CONFIG_HID_THRUSTMASTER is not set
++# CONFIG_HID_ZEROPLUS is not set
++# CONFIG_HID_ZYDACRON is not set
++
++#
++# USB HID support
++#
++CONFIG_USB_HID=y
++# CONFIG_HID_PID is not set
++# CONFIG_USB_HIDDEV is not set
 +# CONFIG_USB_ARCH_HAS_OHCI is not set
 +CONFIG_USB_ARCH_HAS_EHCI=y
 +# CONFIG_USB_ARCH_HAS_XHCI is not set
-+# CONFIG_USB_SUPPORT is not set
++CONFIG_USB_SUPPORT=y
++CONFIG_USB_COMMON=y
++CONFIG_USB_ARCH_HAS_HCD=y
++CONFIG_USB=y
++# CONFIG_USB_DEBUG is not set
++CONFIG_USB_ANNOUNCE_NEW_DEVICES=y
++
++#
++# Miscellaneous USB options
++#
++# CONFIG_USB_DYNAMIC_MINORS is not set
++# CONFIG_USB_SUSPEND is not set
++# CONFIG_USB_OTG_WHITELIST is not set
++# CONFIG_USB_OTG_BLACKLIST_HUB is not set
++# CONFIG_USB_DWC3 is not set
++# CONFIG_USB_MON is not set
++# CONFIG_USB_WUSB_CBAF is not set
++
++#
++# USB Host Controller Drivers
++#
++# CONFIG_USB_C67X00_HCD is not set
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_ROOT_HUB_TT=y
++CONFIG_USB_EHCI_TT_NEWSCHED=y
++CONFIG_USB_XUSBPS_DR_OF=y
++CONFIG_USB_EHCI_XUSBPS=y
++# CONFIG_USB_OXU210HP_HCD is not set
++# CONFIG_USB_ISP116X_HCD is not set
++# CONFIG_USB_ISP1760_HCD is not set
++# CONFIG_USB_ISP1362_HCD is not set
++# CONFIG_USB_EHCI_HCD_PLATFORM is not set
++# CONFIG_USB_SL811_HCD is not set
++# CONFIG_USB_R8A66597_HCD is not set
++# CONFIG_USB_MUSB_HDRC is not set
++# CONFIG_USB_CHIPIDEA is not set
++# CONFIG_USB_RENESAS_USBHS is not set
++
++#
++# USB Device Class drivers
++#
++# CONFIG_USB_ACM is not set
++# CONFIG_USB_PRINTER is not set
++# CONFIG_USB_WDM is not set
++# CONFIG_USB_TMC is not set
++
++#
++# NOTE: USB_STORAGE depends on SCSI but BLK_DEV_SD may
++#
++
++#
++# also be needed; see USB_STORAGE Help for more info
++#
++CONFIG_USB_STORAGE=y
++CONFIG_USB_STORAGE_DEBUG=y
++# CONFIG_USB_STORAGE_REALTEK is not set
++# CONFIG_USB_STORAGE_DATAFAB is not set
++# CONFIG_USB_STORAGE_FREECOM is not set
++# CONFIG_USB_STORAGE_ISD200 is not set
++# CONFIG_USB_STORAGE_USBAT is not set
++# CONFIG_USB_STORAGE_SDDR09 is not set
++# CONFIG_USB_STORAGE_SDDR55 is not set
++# CONFIG_USB_STORAGE_JUMPSHOT is not set
++# CONFIG_USB_STORAGE_ALAUDA is not set
++# CONFIG_USB_STORAGE_ONETOUCH is not set
++# CONFIG_USB_STORAGE_KARMA is not set
++# CONFIG_USB_STORAGE_CYPRESS_ATACB is not set
++# CONFIG_USB_STORAGE_ENE_UB6250 is not set
++# CONFIG_USB_UAS is not set
++# CONFIG_USB_LIBUSUAL is not set
++
++#
++# USB Imaging devices
++#
++# CONFIG_USB_MDC800 is not set
++# CONFIG_USB_MICROTEK is not set
++
++#
++# USB port drivers
++#
++# CONFIG_USB_SERIAL is not set
++
++#
++# USB Miscellaneous drivers
++#
++# CONFIG_USB_EMI62 is not set
++# CONFIG_USB_EMI26 is not set
++# CONFIG_USB_ADUTUX is not set
++# CONFIG_USB_SEVSEG is not set
++# CONFIG_USB_RIO500 is not set
++# CONFIG_USB_LEGOTOWER is not set
++# CONFIG_USB_LCD is not set
++# CONFIG_USB_LED is not set
++# CONFIG_USB_CYPRESS_CY7C63 is not set
++# CONFIG_USB_CYTHERM is not set
++# CONFIG_USB_IDMOUSE is not set
++# CONFIG_USB_FTDI_ELAN is not set
++# CONFIG_USB_APPLEDISPLAY is not set
++# CONFIG_USB_SISUSBVGA is not set
++# CONFIG_USB_LD is not set
++# CONFIG_USB_TRANCEVIBRATOR is not set
++# CONFIG_USB_IOWARRIOR is not set
++# CONFIG_USB_TEST is not set
++# CONFIG_USB_ISIGHTFW is not set
++# CONFIG_USB_YUREX is not set
++
++#
++# USB Physical Layer drivers
++#
++# CONFIG_USB_ISP1301 is not set
++CONFIG_USB_GADGET=y
++# CONFIG_USB_GADGET_DEBUG is not set
++# CONFIG_USB_GADGET_DEBUG_FILES is not set
++# CONFIG_USB_GADGET_DEBUG_FS is not set
++CONFIG_USB_GADGET_VBUS_DRAW=2
++CONFIG_USB_GADGET_STORAGE_NUM_BUFFERS=2
++
++#
++# USB Peripheral Controller
++#
++# CONFIG_USB_GADGET_XUSBPS is not set
++# CONFIG_USB_FUSB300 is not set
++# CONFIG_USB_R8A66597 is not set
++# CONFIG_USB_GADGET_XILINX is not set
++# CONFIG_USB_MV_UDC is not set
++# CONFIG_USB_M66592 is not set
++# CONFIG_USB_NET2272 is not set
++# CONFIG_USB_DUMMY_HCD is not set
++# CONFIG_USB_ZERO is not set
++# CONFIG_USB_ETH is not set
++# CONFIG_USB_G_NCM is not set
++# CONFIG_USB_GADGETFS is not set
++# CONFIG_USB_FUNCTIONFS is not set
++# CONFIG_USB_FILE_STORAGE is not set
++# CONFIG_USB_MASS_STORAGE is not set
++# CONFIG_USB_G_SERIAL is not set
++# CONFIG_USB_G_PRINTER is not set
++# CONFIG_USB_CDC_COMPOSITE is not set
++# CONFIG_USB_G_ACM_MS is not set
++# CONFIG_USB_G_MULTI is not set
++# CONFIG_USB_G_HID is not set
++# CONFIG_USB_G_DBGP is not set
++
++#
++# OTG and related infrastructure
++#
++# CONFIG_USB_GPIO_VBUS is not set
++# CONFIG_USB_ULPI is not set
++# CONFIG_NOP_USB_XCEIV is not set
 +# CONFIG_MMC is not set
 +# CONFIG_MEMSTICK is not set
 +# CONFIG_NEW_LEDS is not set

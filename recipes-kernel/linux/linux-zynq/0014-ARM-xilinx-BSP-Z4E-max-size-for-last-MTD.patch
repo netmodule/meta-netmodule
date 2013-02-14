@@ -1,0 +1,29 @@
+From c11205384e045cef3bfb7a7e235eea0ec490561b Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 23 Jan 2013 12:03:34 +0100
+Subject: [PATCH 14/16] ARM: xilinx: BSP: Z4E max size for last MTD
+
+No more fixed size for the last MTD partition
+in the DTS file of the Z4E Board
+
+Signed-off-by:David Andrey david.andrey@netmodule.com
+---
+ arch/arm/boot/dts/zynq-z4e.dts |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/arch/arm/boot/dts/zynq-z4e.dts b/arch/arm/boot/dts/zynq-z4e.dts
+index f563935..07c3c55 100644
+--- a/arch/arm/boot/dts/zynq-z4e.dts
++++ b/arch/arm/boot/dts/zynq-z4e.dts
+@@ -161,7 +161,7 @@
+ 			
+ 			partition@2 {
+ 				label = "nand-rootfs";
+-				reg = <0x600000 0xFA00000>;
++				reg = <0x600000 0x0>; /* maximum size */
+ 			};
+ 		};
+ 
+-- 
+1.7.4.1
+

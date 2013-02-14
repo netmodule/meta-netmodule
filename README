@@ -1,5 +1,5 @@
 OpenEmbedded/Yocto BSP Layer from NetModule <www.netmodule.com>.
-Use this layer with the Enclustra ZX3 Module and PM3 Baseboard
+Use this layer with the Enclustra ZX3 Module and PM3 Baseboard or Starter Baseboard
 <http://www.enclustra.com> or the NetModule Zynq4Ethernet Platform.
 
 It is hosted at http://git.github.org/cgit/cgit.cgi/meta-metmodule/

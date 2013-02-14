@@ -1,7 +1,7 @@
 From f67d5050e23b55a9d94a2c9d28dca03b53b0af35 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 4 Jan 2013 14:23:41 +0100
-Subject: [PATCH 13/16] ARM: xilinx: BSP: Z4E gets MAC addr from EERPOM
+Subject: [PATCH 13/20] ARM: xilinx: BSP: Z4E gets MAC addr from EERPOM
 
 Z4E board uses MAC address set in the module EEPROM
 

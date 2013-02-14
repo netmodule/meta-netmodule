@@ -1,7 +1,7 @@
-From 21f2f71137d68c3ea64c349dbe52dbed2b9b29fe Mon Sep 17 00:00:00 2001
+From e6b67f9964765dfe5f779ebcadc1ad7e9140169f Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 18 Dec 2012 08:08:54 +0100
-Subject: [PATCH 11/12] ARM: xilinx: BSP: UBI support for ZX3_PM3
+Subject: [PATCH 11/20] ARM: xilinx: BSP: UBI support for ZX3_PM3
 
 Add UBI support for the Enclustra Marx ZX3 Board
 

@@ -1,28 +1,30 @@
-From 13c6fc0565bb631bd3dd993f176da80ddb26aa2f Mon Sep 17 00:00:00 2001
-From: David Andrey <david.andrey@netmodule.com>
-Date: Fri, 7 Dec 2012 12:13:27 +0100
-Subject: [PATCH 02/20] zynq: BSP: support for ZX3_PM3 board
+From bc0b76982894b3909fb1c4338ad05644537f8c93 Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Wed, 9 Jan 2013 13:52:51 +0100
+Subject: [PATCH 19/20] zynq: BSP: support for ZX3_Starter board
 
-Added basic support for Enclustra ZX3 Mars PM3 board
-
-Signed-off-by:David Andrey david.andrey@netmodule.com
+Added basic support for Enclustra ZX3 Mars Starter board
 ---
- board/enclustra/zx3_pm3/Makefile        |   56 ++++++
- board/enclustra/zx3_pm3/board.c         |  290 +++++++++++++++++++++++++++++++
- board/enclustra/zx3_pm3/lowlevel_init.S |  198 +++++++++++++++++++++
- boards.cfg                              |    1 +
- include/configs/zx3_pm3.h               |  110 ++++++++++++
- 5 files changed, 655 insertions(+), 0 deletions(-)
- create mode 100644 board/enclustra/zx3_pm3/Makefile
- create mode 100644 board/enclustra/zx3_pm3/board.c
- create mode 100644 board/enclustra/zx3_pm3/lowlevel_init.S
- create mode 100644 include/configs/zx3_pm3.h
+ board/enclustra/zx3_starter/Makefile        |   56 +++++
+ board/enclustra/zx3_starter/board.c         |  290 +++++++++++++++++++++++++++
+ board/enclustra/zx3_starter/lowlevel_init.S |  198 ++++++++++++++++++
+ boards.cfg                                  |    1 +
+ common/cmd_nand.c                           |    2 +-
+ common/cmd_sf.c                             |    2 +-
+ drivers/net/zynq_gem_wrap.c                 |   16 +-
+ include/configs/zx3_pm3.h                   |    6 +-
+ include/configs/zx3_starter.h               |  154 ++++++++++++++
+ 9 files changed, 714 insertions(+), 11 deletions(-)
+ create mode 100644 board/enclustra/zx3_starter/Makefile
+ create mode 100644 board/enclustra/zx3_starter/board.c
+ create mode 100644 board/enclustra/zx3_starter/lowlevel_init.S
+ create mode 100644 include/configs/zx3_starter.h
 
-diff --git a/board/enclustra/zx3_pm3/Makefile b/board/enclustra/zx3_pm3/Makefile
+diff --git a/board/enclustra/zx3_starter/Makefile b/board/enclustra/zx3_starter/Makefile
 new file mode 100644
 index 0000000..dfb103a
 --- /dev/null
-+++ b/board/enclustra/zx3_pm3/Makefile
++++ b/board/enclustra/zx3_starter/Makefile
 @@ -0,0 +1,56 @@
 +#
 +# (C) Copyright 2000-2006
@@ -80,11 +82,11 @@ index 0000000..dfb103a
 +sinclude $(obj).depend
 +
 +#########################################################################
-diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+diff --git a/board/enclustra/zx3_starter/board.c b/board/enclustra/zx3_starter/board.c
 new file mode 100644
 index 0000000..4f6e65e
 --- /dev/null
-+++ b/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_starter/board.c
 @@ -0,0 +1,290 @@
 +/*
 + * (C) Copyright 2012 Michal Simek <monstr@monstr.eu>
@@ -376,11 +378,11 @@ index 0000000..4f6e65e
 +
 +	while(1) {;}
 +}
-diff --git a/board/enclustra/zx3_pm3/lowlevel_init.S b/board/enclustra/zx3_pm3/lowlevel_init.S
+diff --git a/board/enclustra/zx3_starter/lowlevel_init.S b/board/enclustra/zx3_starter/lowlevel_init.S
 new file mode 100644
 index 0000000..3524f1f
 --- /dev/null
-+++ b/board/enclustra/zx3_pm3/lowlevel_init.S
++++ b/board/enclustra/zx3_starter/lowlevel_init.S
 @@ -0,0 +1,198 @@
 +
 +/*
@@ -581,28 +583,137 @@ index 0000000..3524f1f
 +	mov pc, lr
 +
 diff --git a/boards.cfg b/boards.cfg
-index 2382d29..adca12c 100644
+index adca12c..bcd7c9f 100644
 --- a/boards.cfg
 +++ b/boards.cfg
-@@ -279,6 +279,7 @@ zynq_zc70x                   arm         armv7       zynq                xilinx
- zynq_cseflash                arm         armv7       zynq                xilinx         zynq
+@@ -280,6 +280,7 @@ zynq_cseflash                arm         armv7       zynq                xilinx
  zynq_zed                     arm         armv7       zynq                xilinx         zynq
  zynq4ethernet                arm         armv7       zynq4ethernet       netmodule      zynq
-+zx3_pm3                      arm         armv7       zx3_pm3             enclustra      zynq
+ zx3_pm3                      arm         armv7       zx3_pm3             enclustra      zynq
++zx3_starter                  arm         armv7       zx3_starter         enclustra      zynq
  omap5_evm                    arm         armv7       omap5_evm           ti		omap5
  s5p_goni                     arm         armv7       goni                samsung        s5pc1xx
  smdkc100                     arm         armv7       smdkc100            samsung        s5pc1xx
+diff --git a/common/cmd_nand.c b/common/cmd_nand.c
+index c1cda50..9bd46f3 100644
+--- a/common/cmd_nand.c
++++ b/common/cmd_nand.c
+@@ -454,7 +454,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+ 
+ 	cmd = argv[1];
+ 
+-#if defined (CONFIG_ZX3_PM3) || defined (CONFIG_Z4E)
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER) || defined (CONFIG_Z4E)
+ 	zx3_set_storage (ZX3_NAND);
+ #endif
+ 
+diff --git a/common/cmd_sf.c b/common/cmd_sf.c
+index 8ea2cde..627d9ce 100644
+--- a/common/cmd_sf.c
++++ b/common/cmd_sf.c
+@@ -288,7 +288,7 @@ static int do_spi_flash(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[
+ 	--argc;
+ 	++argv;
+ 
+-#if defined (CONFIG_ZX3_PM3) || defined (CONFIG_Z4E)
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER) || defined (CONFIG_Z4E)
+ 	zx3_set_storage (ZX3_QSPI);
+ #endif
+ 
+diff --git a/drivers/net/zynq_gem_wrap.c b/drivers/net/zynq_gem_wrap.c
+index 7669cdf..fba1381 100755
+--- a/drivers/net/zynq_gem_wrap.c
++++ b/drivers/net/zynq_gem_wrap.c
+@@ -249,7 +249,7 @@ int Xgmac_one_time_init(void)
+ 	tmp |= (1 << 1);	/* RGMII transmit clock internally delayed */
+ 	phy_wr(EmacPssInstancePtr, 20, tmp);
+ 
+-#elif defined (CONFIG_ZX3_PM3)
++#elif defined (CONFIG_ZX3_PM3) || defined (CONFIG_ZX3_STARTER)
+ 	/* Extended PHY registers */
+ 	/* Check if PHY is supported */
+ 	if ((phy_id >> 10) == 0x885) {	/* Micrel's OUI ? */
+@@ -299,7 +299,7 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 	int link_speed;
+ 	XEmacPss *EmacPssInstancePtr = &EmacPssInstance;
+ 
+-#ifdef CONFIG_ZX3_PM3
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER)
+ 	/* Check if the link has changed (plug/unplug, auto-neg) */
+ 	tmp = phy_rd(EmacPssInstancePtr, 0x1B);	/* Interrupt status register */
+ 	if (tmp & 0x0005) {	/* link up or down detected */
+@@ -333,7 +333,9 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 
+ 	/*************************** PHY Setup ***************************/
+ 
+-#ifndef CONFIG_ZX3_PM3	/* Please define the specific board / PHY !!! */
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER)	/* Please define the specific board / PHY !!! */
++
++#else
+ 	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
+ #endif
+ 
+@@ -375,7 +377,7 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ 	}
+ 
+ 	/* Check if the link is up */
+-#ifdef CONFIG_ZX3_PM3	/* should be the generic code ?! */
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER)	/* should be the generic code ?! */
+ 	tmp = phy_rd(EmacPssInstancePtr, 1);
+ 	if (!((tmp >> 2) & 1)) {
+ 		puts("***Error: Link is not up.\n");
+@@ -398,7 +400,7 @@ int Xgmac_init(struct eth_device *dev, bd_t * bis)
+ #endif
+ 
+ 	/********************** Determine link speed **********************/
+-#ifdef CONFIG_ZX3_PM3
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER)
+ 	tmp = phy_rd(EmacPssInstancePtr, 31); //MICREL PHY KSZ9021RN Control Reg
+ 	if ( ((tmp>>6 ) & 1) == 1)		/* 1000Mbps */
+ 		link_speed = 1000;
+@@ -835,7 +837,9 @@ void Xgmac_set_eth_advertise(XEmacPss *EmacPssInstancePtr, int link_speed)
+ 	XEmacPss_WriteReg(EmacPssInstancePtr->Config.BaseAddress,
+ 			  XEMACPSS_NWCFG_OFFSET, tmp);
+ 
+-#ifndef CONFIG_ZX3_PM3	/* Please define the specific board / PHY !!! */
++#if defined (CONFIG_ZX3_PM3) || defined(CONFIG_ZX3_STARTER)	/* Please define the specific board / PHY !!! */
++
++#else
+ 	phy_wr(EmacPssInstancePtr, 22, 0);	/* page 0 */
+ #endif
+ 
 diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
-new file mode 100644
-index 0000000..9d187af
---- /dev/null
+index 058d5bb..6834be1 100644
+--- a/include/configs/zx3_pm3.h
 +++ b/include/configs/zx3_pm3.h
-@@ -0,0 +1,110 @@
+@@ -16,8 +16,8 @@
+  * MA 02111-1307 USA
+  */
+ 
+-#ifndef __CONFIG_ZYNQ4ETHERNET_H
+-#define __CONFIG_ZYNQ4ETHERNET_H
++#ifndef __CONFIG_ZX3_PM3_H
++#define __CONFIG_ZX3_PM3_H
+ 
+ #define CONFIG_ZX3_PM3 /* ZX3 PM3 Board */
+ 
+@@ -151,4 +151,4 @@
+ #undef  CONFIG_SYS_I2C_MULTI_EEPROMS				/* consider only the board EEPROM */
+ 
+ 
+-#endif /* __CONFIG_ZYNQ4ETHERNET_H */
++#endif /* __CONFIG_ZX3_PM*_H */
+diff --git a/include/configs/zx3_starter.h b/include/configs/zx3_starter.h
+new file mode 100644
+index 0000000..0130f24
+--- /dev/null
++++ b/include/configs/zx3_starter.h
+@@ -0,0 +1,154 @@
 +/*
 + * (C) Copyright 2012 Xilinx
 + * (C) Copyright 2012 NetModule
 + *
-+ * Configuration for Enclustra Zynq Mars Board - ZX3-PM3
++ * Configuration for Enclustra Zynq Mars Board - ZX3-STARTER
 + * See zynq_common.h for Zynq common configs
 + *
 + * This program is free software; you can redistribute it and/or
@@ -616,16 +727,25 @@ index 0000000..9d187af
 + * MA 02111-1307 USA
 + */
 +
-+#ifndef __CONFIG_ZYNQ4ETHERNET_H
-+#define __CONFIG_ZYNQ4ETHERNET_H
++#ifndef __CONFIG_ZX3_STARTER_H
++#define __CONFIG_ZX3_STARTER_H
++
++#define CONFIG_ZX3_STARTER /* ZX3 STARTER Board */
 +
 +#define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
 +
 +#define CONFIG_ZYNQ_SERIAL_UART1
 +
-+#define CONFIG_ZYNQ_GEM0
-+#define CONFIG_PHY_MICREL
-+#define CONFIG_PHY_ADDR 3
++//#define CONFIG_ZYNQ_GEM0
++//#define CONFIG_PHY_MICREL
++//#define CONFIG_PHY_ADDR 3
++
++#define CONFIG_PHY_ADDR    3
++
++#define CONFIG_ZYNQ_GEM_OLD
++#define CONFIG_XGMAC_PHY_ADDR CONFIG_PHY_ADDR
++#define CONFIG_SYS_ENET
++
 +
 +#define CONFIG_CMD_NET
 +#define CONFIG_CMD_MII      /* mii utils */
@@ -634,6 +754,16 @@ index 0000000..9d187af
 +
 +#define CONFIG_ZYNQ_SPI
 +#define CONFIG_NAND_ZYNQ
++
++#define CONFIG_CMD_MTDPARTS
++#define CONFIG_MTD_PARTITIONS
++#define CONFIG_RBTREE
++#define CONFIG_CMD_UBI
++
++#define MTDIDS_DEFAULT          "nand0=nand"
++#define MTDPARTS_DEFAULT        "mtdparts=nand:5m(nand-linux),"\
++                    "1m(nand-device-tree),-(nand-rootfs)"
++
 +
 +#include <configs/zynq_common.h>
 +
@@ -650,6 +780,8 @@ index 0000000..9d187af
 +    "nand_devicetree_size=0x10000\0" \
 +    "fdt_high=0x20000000\0" \
 +    "initrd_high=0x20000000\0"  \
++    "mtdids=" MTDIDS_DEFAULT "\0"    \
++    "mtdparts=" MTDPARTS_DEFAULT "\0" \
 +    "nandargs=setenv bootargs console=ttyPS0,115200 " \
 +        "root=ubi0:ubi-rootfs rw " \
 +        "rootfstype=ubifs " \
@@ -663,8 +795,10 @@ index 0000000..9d187af
 +        "$othbootargs " \
 +        "earlyprintk\0" \
 +    "prodboot=echo Booting on NAND...;" \
-+        "nand read 0x3000000 0x000000 ${nand_kernel_size};" \
-+        "nand read 0x2A00000 0x500000 ${nand_devicetree_size};" \
++        "ubi part nand-linux;" \
++        "ubi read 0x3000000 kernel ${nand_kernel_size};" \
++        "ubi part nand-device-tree;" \
++        "ubi read 0x2A00000 dtb ${nand_devicetree_size};" \
 +        "run nandargs;" \
 +        "bootm 0x3000000 - 0x2A00000\0" \
 +    "rescboot=echo Booting on QSPI Flash...;" \
@@ -707,7 +841,28 @@ index 0000000..9d187af
 +#undef CONFIG_SYS_PROMPT
 +#define CONFIG_SYS_PROMPT   "zx3-uboot> "
 +
-+#endif /* __CONFIG_ZYNQ4ETHERNET_H */
++/**
++ * I2C support
++ */
++#define CONFIG_ZYNQ_I2C						/* Support for Zynq I2C */
++#define CONFIG_HARD_I2C						/* I2C with hardware support */
++#define CONFIG_ZYNQ_I2C_CTLR_0				/* Enable I2C_0 */
++#define CONFIG_SYS_I2C_SPEED		100000	/* I2C speed and slave address */
++
++#define CONFIG_CMD_I2C
++
++/**
++ * I2C EEPROM
++ */
++#define CONFIG_CMD_EEPROM
++#define CONFIG_SYS_I2C_EEPROM_ADDR				0x54
++#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN			2
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS		6	/* 5 bits = 32 bytes */
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	10
++#undef  CONFIG_SYS_I2C_MULTI_EEPROMS				/* consider only the board EEPROM */
++
++
++#endif /* __CONFIG_ZX3_STARTER_H */
 -- 
 1.7.4.1
 

@@ -1,7 +1,7 @@
-From 63a1583b5e34f0c647828623c2359a9d939f8697 Mon Sep 17 00:00:00 2001
+From babb62ebd1e5cb643cd61347d2a5a887845f21af Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 14 Dec 2012 17:09:41 +0100
-Subject: [PATCH 09/12] ARM: xilinx: BSP: auto boot for Z4E
+Subject: [PATCH 09/20] ARM: xilinx: BSP: auto boot for Z4E
 
 Add auto boot for the Z4E board
 

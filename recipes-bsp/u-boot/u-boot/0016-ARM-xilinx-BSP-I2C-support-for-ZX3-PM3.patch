@@ -1,7 +1,7 @@
 From 59defaecc03aabdc2a549e7a849407427a60e7f0 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 4 Jan 2013 16:38:43 +0100
-Subject: [PATCH 16/16] ARM: xilinx: BSP: I2C support for ZX3-PM3
+Subject: [PATCH 16/20] ARM: xilinx: BSP: I2C support for ZX3-PM3
 
 Add I2C and MAC address setup from EEPROM
 for the Enclustra ZX3-PM3 board

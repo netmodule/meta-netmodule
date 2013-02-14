@@ -1,7 +1,7 @@
 From 5746c29cdaa2aefc2e5f239f06adadcf64f9a156 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 4 Jan 2013 15:07:11 +0100
-Subject: [PATCH 15/16] ARM: xilinx: BSP: only board EEPROM for Z4E
+Subject: [PATCH 15/20] ARM: xilinx: BSP: only board EEPROM for Z4E
 
 The module EEPROM conflict in address size with
 the base board EEPROM. Additionaly the module

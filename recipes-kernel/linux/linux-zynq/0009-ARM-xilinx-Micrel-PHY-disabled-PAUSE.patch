@@ -1,7 +1,7 @@
 From fb40907156088af74bd02fdb82e8de76e97048a7 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Thu, 29 Nov 2012 13:16:29 +0100
-Subject: [PATCH 09/12] ARM: xilinx: Micrel PHY: disabled PAUSE
+Subject: [PATCH 09/16] ARM: xilinx: Micrel PHY: disabled PAUSE
 
 No Gbit link can be auto-negotiated with PAUSE
 sym and asym enabled, for KSZ9021 too

@@ -1,0 +1,93 @@
+From 9ba4c2b5182002d64abcb2fa3eb7fc4f06681919 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 30 Jan 2013 13:57:19 +0100
+Subject: [PATCH 18/20] Z4E: add board phy init
+
+Add specific board phy init for specific skew value
+
+Signed-off-by: David Andrey david.andrey@netmodule.com
+---
+ board/netmodule/zynq4ethernet/board.c |   47 +++++++++++++++++++++++++++++++++
+ include/configs/zynq4ethernet.h       |    1 +
+ 2 files changed, 48 insertions(+), 0 deletions(-)
+
+diff --git a/board/netmodule/zynq4ethernet/board.c b/board/netmodule/zynq4ethernet/board.c
+index c35d764..ff2cc07 100644
+--- a/board/netmodule/zynq4ethernet/board.c
++++ b/board/netmodule/zynq4ethernet/board.c
+@@ -28,6 +28,7 @@
+ #include <asm/arch/nand.h>
+ #include <netdev.h>
+ #include <zynqpl.h>
++#include <phy.h>
+ 
+ #define BOOT_MODE_REG     (XPSS_SYS_CTRL_BASEADDR + 0x25C)
+ #define BOOT_MODES_MASK    0x0000000F
+@@ -204,6 +205,52 @@ void zx3_set_storage (int store) {
+ 
+ #ifdef CONFIG_CMD_NET
+ 
++int board_phy_config(struct phy_device *phydev)
++{
++	static int do_once;
++
++	if (!do_once) {
++
++		/* first interface, on module */
++		if (phydev->dev->iobase == CONFIG_ZYNQ_GEM_BASEADDR0) {
++
++			/* Giga skew value */
++			if (phydev->phy_id == 0x221611) { /* KSZ9021, used on first board series */
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xB, 0x8104); // RGMII clock and control pad skew (reg 260)
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xC, 0xF0F0);
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xB, 0x8105); // RGMII RX pad skew (reg 261)
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xC, 0x0);
++			}
++
++			else if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xD, 0x0002);
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xE, 0x0008); // Reg 0x8
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xD, 0x4002);
++				phy_write(phydev, CONFIG_PHY_ADDR, 0xE, 0x03FF); //3FF = max RXC and TXC delay
++			}
++			else {
++				printf ("unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
++			}
++		}
++
++#if 0
++		/* second interface, on board */
++		else if (phydev->dev->iobase == CONFIG_ZYNQ_GEM_BASEADDR1) {
++
++		}
++#endif
++	}
++
++	/* call the standart PHY configuration as well */
++	if (phydev->drv->config)
++		phydev->drv->config(phydev);
++
++	do_once = 1;
++	return 0;
++}
++
++
++
+ #define ZX3_SHA_EEPROM_ADDR     (0x5C)
+ #define ZX3_SHA_EEPROM_ADDR_LEN (0x01)
+ #define ZX3_SHA_EEPROM_MAC_OFFSET (0x10)
+diff --git a/include/configs/zynq4ethernet.h b/include/configs/zynq4ethernet.h
+index dd27934..2e3ce3c 100644
+--- a/include/configs/zynq4ethernet.h
++++ b/include/configs/zynq4ethernet.h
+@@ -27,6 +27,7 @@
+ 
+ #define CONFIG_ZYNQ_GEM0
+ #define CONFIG_PHY_MICREL
++#define CONFIG_PHY_MICREL_KSZ9021
+ #define CONFIG_PHY_ADDR 3
+ 
+ #define CONFIG_CMD_NET
+-- 
+1.7.4.1
+
