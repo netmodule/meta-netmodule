@@ -1,7 +1,7 @@
 From 31ba3dcb7158ef84f5f7b18636cb031e9f01b9d5 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 22 Jan 2013 10:16:07 +0100
-Subject: [PATCH 13/16] ARM: xilinx: BSP: fix eth0 skew
+Subject: [PATCH 13/17] ARM: xilinx: BSP: fix eth0 skew
 
 Ethernet skew value are not initialized in the bootloader and
 reseted after a FPGA update. This patch set the skew values

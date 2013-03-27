@@ -30,6 +30,7 @@ SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch  
                     file://0018-Z4E-add-board-phy-init.patch                           \
                     file://0019-zynq-BSP-support-for-ZX3_Starter-board.patch           \
                     file://0020-z4e-fix-environment-mismatch-after-master-merge.patch  \
+                    file://0021-update-to-512-MB.patch                                 \
                   "
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 

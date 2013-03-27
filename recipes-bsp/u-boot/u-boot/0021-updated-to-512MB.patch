@@ -1,0 +1,39 @@
+From 1bd8dbe64fd6faa664efbe546d290ce4803e71fb Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Fri, 22 Mar 2013 17:15:54 +0100
+Subject: [PATCH 21/21] updated to 512MB
+
+---
+ include/configs/zx3_pm3.h     |    2 +-
+ include/configs/zx3_starter.h |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 6834be1..6d8f3a9 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -21,7 +21,7 @@
+ 
+ #define CONFIG_ZX3_PM3 /* ZX3 PM3 Board */
+ 
+-#define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
++#define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
+ 
+ #define CONFIG_ZYNQ_SERIAL_UART1
+ 
+diff --git a/include/configs/zx3_starter.h b/include/configs/zx3_starter.h
+index 0130f24..a1280d3 100644
+--- a/include/configs/zx3_starter.h
++++ b/include/configs/zx3_starter.h
+@@ -21,7 +21,7 @@
+ 
+ #define CONFIG_ZX3_STARTER /* ZX3 STARTER Board */
+ 
+-#define PHYS_SDRAM_1_SIZE (256 * 1024 * 1024)
++#define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
+ 
+ #define CONFIG_ZYNQ_SERIAL_UART1
+ 
+-- 
+1.7.4.1
+

@@ -1,0 +1,39 @@
+From bde43d0f4b4f8f28a80ffcabda4d8738db174904 Mon Sep 17 00:00:00 2001
+From: Sven Meier <sven.meier@enclustra.com>
+Date: Wed, 27 Mar 2013 16:13:14 +0100
+Subject: [PATCH 17/17] [PATCH] ARM xilinx BSP updated RAM size to 512MB
+
+---
+ arch/arm/boot/dts/zynq-zx3-pm3.dts     |    2 +-
+ arch/arm/boot/dts/zynq-zx3-starter.dts |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/zynq-zx3-pm3.dts b/arch/arm/boot/dts/zynq-zx3-pm3.dts
+index 1732852..2c1bc80 100644
+--- a/arch/arm/boot/dts/zynq-zx3-pm3.dts
++++ b/arch/arm/boot/dts/zynq-zx3-pm3.dts
+@@ -22,7 +22,7 @@
+ 
+ 	memory {
+ 		device_type = "memory";
+-		reg = <0x0 0x10000000>; /* 256 MB */
++		reg = <0x0 0x20000000>; /* 512 MB */
+ 	};
+ 
+ 	chosen {
+diff --git a/arch/arm/boot/dts/zynq-zx3-starter.dts b/arch/arm/boot/dts/zynq-zx3-starter.dts
+index 95559a3..2ea04f5 100644
+--- a/arch/arm/boot/dts/zynq-zx3-starter.dts
++++ b/arch/arm/boot/dts/zynq-zx3-starter.dts
+@@ -22,7 +22,7 @@
+ 
+ 	memory {
+ 		device_type = "memory";
+-		reg = <0x0 0x10000000>; /* 256 MB */
++		reg = <0x0 0x20000000>; /* 512 MB */
+ 	};
+ 
+ 	chosen {
+-- 
+1.7.4.1
+

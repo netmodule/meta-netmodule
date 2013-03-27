@@ -1,7 +1,7 @@
 From 988013ec4d7396d6f6162c1d0afcd32d46b03dab Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 18 Dec 2012 15:47:56 +0100
-Subject: [PATCH 12/20] ARM: xilinx: BSP: use legacy ETH driver for ZX3_PM3
+Subject: [PATCH 12/21] ARM: xilinx: BSP: use legacy ETH driver for ZX3_PM3
 
 Ethernet is, for some unknown reasons, no working with
 the new GEM driver. Switch back to the old one.
