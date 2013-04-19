@@ -1,0 +1,25 @@
+From 2fb2c103eba219cd30ae30b3b217790006d6f810 Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@netmodule.com>
+Date: Wed, 17 Apr 2013 12:01:51 +0200
+Subject: [PATCH 2/2] Do not strip libtar.
+
+---
+ libtar/Makefile.in |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/libtar/Makefile.in b/libtar/Makefile.in
+index 3128127..c6e42e8 100644
+--- a/libtar/Makefile.in
++++ b/libtar/Makefile.in
+@@ -16,7 +16,7 @@ PACKAGE_VERSION	= @PACKAGE_VERSION@
+ 
+ ### Installation programs and flags
+ INSTALL		= @INSTALL@
+-INSTALL_PROGRAM	= @INSTALL_PROGRAM@ -s
++INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+ INSTALL_DATA	= @INSTALL_DATA@
+ LN_S		= @LN_S@
+ MKDIR		= @MKDIR@
+-- 
+1.7.4.1
+
