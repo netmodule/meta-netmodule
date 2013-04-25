@@ -1,7 +1,7 @@
 From 9ba4c2b5182002d64abcb2fa3eb7fc4f06681919 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 30 Jan 2013 13:57:19 +0100
-Subject: [PATCH 18/20] Z4E: add board phy init
+Subject: [PATCH 18/21] Z4E: add board phy init
 
 Add specific board phy init for specific skew value
 

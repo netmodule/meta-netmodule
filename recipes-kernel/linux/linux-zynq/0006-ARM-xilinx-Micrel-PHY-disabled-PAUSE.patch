@@ -1,7 +1,7 @@
 From dd33cd29afc6dc5e42ee6d766d1825b089a3b932 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 28 Nov 2012 17:31:09 +0100
-Subject: [PATCH 06/16] ARM: xilinx: Micrel PHY: disabled PAUSE
+Subject: [PATCH 06/17] ARM: xilinx: Micrel PHY: disabled PAUSE
 
 No Gbit link can be auto-negotiated with PAUSE
 sym and asym enabled

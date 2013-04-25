@@ -1,7 +1,7 @@
 From 0c4ada71e471f00a33c642774a65d0ecbfa9f2aa Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Thu, 22 Nov 2012 14:29:18 +0100
-Subject: [PATCH 04/16] ARM: xilinx: BSP: setup LED for Z4E iMarvell PHY
+Subject: [PATCH 04/17] ARM: xilinx: BSP: setup LED for Z4E iMarvell PHY
 
 Added custom LED settings in the Marvell driver for NetModule
 Z4E Board

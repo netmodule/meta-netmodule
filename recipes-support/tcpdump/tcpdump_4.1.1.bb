@@ -18,12 +18,12 @@ inherit autotools
 # ac_cv_linux_vers=${ac_cv_linux_vers=2}
 
 EXTRA_OECONF = "--without-crypto \
-		${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6', '--disable-ipv6', d)}"
+                ${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6', '--disable-ipv6', d)}"
 
 do_configure() {
 	# AC_CHECK_LIB(dlpi.. was looking to host /lib
 	sed -i 's:-L/lib:-L${STAGING_LIBDIR}:g' ./configure.in
-        
+
 	gnu-configize
 	autoconf
 	oe_runconf

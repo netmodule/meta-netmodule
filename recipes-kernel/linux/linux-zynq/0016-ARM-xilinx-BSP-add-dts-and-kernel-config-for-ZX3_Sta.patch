@@ -1,7 +1,7 @@
 From 06cf776e4d906d0bef98ec7cfc32775174493e85 Mon Sep 17 00:00:00 2001
 From: Sven Meier <sven.meier@enclustra.com>
 Date: Wed, 9 Jan 2013 13:52:00 +0100
-Subject: [PATCH 16/16] ARM: xilinx: BSP: add dts and kernel config for ZX3_Starter
+Subject: [PATCH 16/17] ARM: xilinx: BSP: add dts and kernel config for ZX3_Starter
 
 Add own DTS file and kernel configuration for the
 Enclustra ZX3_Starter board

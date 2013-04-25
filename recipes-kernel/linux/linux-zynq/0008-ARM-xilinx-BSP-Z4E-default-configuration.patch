@@ -1,7 +1,7 @@
 From e5498e5d15f6c611bab3ba3deaf524f3b42b89e7 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 28 Nov 2012 21:36:15 +0100
-Subject: [PATCH 08/16] ARM: xilinx: BSP: Z4E default configuration
+Subject: [PATCH 08/17] ARM: xilinx: BSP: Z4E default configuration
 
 Added further networking support (IPv6, bridge, PHY driver)
 to the default configuration for the NetModule Z4E Board

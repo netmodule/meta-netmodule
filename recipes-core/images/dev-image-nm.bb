@@ -24,6 +24,7 @@ IMAGE_INSTALL += "packagegroup-core-boot \
                 apt \
                 openssh-sftp-server \
                 net-snmp-server \
+                nfs-utils \
                 ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
                 ${CORE_IMAGE_EXTRA_INSTALL} \
                 "

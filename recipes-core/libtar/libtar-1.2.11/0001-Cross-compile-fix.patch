@@ -1,0 +1,25 @@
+From 4de518527b47be8340788f6891acaa3ac37aaddb Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@netmodule.com>
+Date: Wed, 17 Apr 2013 11:52:44 +0200
+Subject: [PATCH] Cross compile fix
+
+---
+ configure |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure b/configure
+index 466a189..83aa707 100755
+--- a/configure
++++ b/configure
+@@ -6236,7 +6236,7 @@ else
+ See \`config.log' for more details." >&5
+ echo "$as_me: error: cannot run test program while cross compiling
+ See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
++     }
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+ 
+-- 
+1.7.4.1
+

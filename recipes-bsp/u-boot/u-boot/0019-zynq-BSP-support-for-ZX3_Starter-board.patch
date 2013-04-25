@@ -1,7 +1,7 @@
 From bc0b76982894b3909fb1c4338ad05644537f8c93 Mon Sep 17 00:00:00 2001
 From: Sven Meier <sven.meier@enclustra.com>
 Date: Wed, 9 Jan 2013 13:52:51 +0100
-Subject: [PATCH 19/20] zynq: BSP: support for ZX3_Starter board
+Subject: [PATCH 19/21] zynq: BSP: support for ZX3_Starter board
 
 Added basic support for Enclustra ZX3 Mars Starter board
 ---

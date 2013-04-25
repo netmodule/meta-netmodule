@@ -1,7 +1,7 @@
 From d0c8de4f0a501f871ebcaab4ab260c14961e1b29 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 23 Jan 2013 13:02:00 +0100
-Subject: [PATCH 15/16] ARM: xilinx: BSP: remove eth1 for ZX3-PM3
+Subject: [PATCH 15/17] ARM: xilinx: BSP: remove eth1 for ZX3-PM3
 
 There is only one Ethernet interface for the
 Enclustra ZX3-PM3 board

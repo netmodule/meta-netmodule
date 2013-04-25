@@ -1,5 +1,5 @@
 SUMMARY = "Memory access tool"
-DESCRIPTION = "Development tool to access memory addresses."
+DESCRIPTION = "Development tool to access memory addresses via /dev/mem."
 AUTHOR = "Jan-Derk Bakker (jdb@lartmaker.nl)"
 HOMEPAGE = "http://www.lartmaker.nl/lartware/port/devmem2.c"
 
@@ -13,10 +13,10 @@ SRC_URI =  "file://devmem2.c"
 S = "${WORKDIR}"
 
 do_compile() {
-    ${CC} devmem2.c -o devmem2
+	${CC} devmem2.c -o devmem2
 }
 
 do_install () {
-    install -d ${D}${bindir}
-    install -m 0755 devmem2 ${D}${bindir}
+	install -d ${D}${bindir}
+	install -m 0755 devmem2 ${D}${bindir}
 }

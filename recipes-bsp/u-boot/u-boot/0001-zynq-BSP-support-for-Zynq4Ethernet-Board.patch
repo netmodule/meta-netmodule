@@ -1,7 +1,7 @@
 From 4a42ec0408995dac26bb943460f569cd1d905b51 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 7 Dec 2012 07:48:50 +0100
-Subject: [PATCH 01/20] zynq: BSP: support for Zynq4Ethernet Board
+Subject: [PATCH 01/21] zynq: BSP: support for Zynq4Ethernet Board
 
 Added minimal support for the NetModule Zynq4Ethernet (Z4E)
 board.

@@ -13,13 +13,17 @@ SRC_URI = "git://git.xilinx.com/linux-xlnx.git"
 LINUX_VERSION ?= "3.5"
 PV = "3.5+xilinx-git"
 
-# enclustra eval board PM3
-SRCREV_zynq-zx3-pm3 = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
+
+
+# enclustra eval board PM3 
+#SRCREV_zynq-zx3-pm3 = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
+SRCREV_zynq-zx3-pm3 = "aa092831fe3322467a4229f9ea30c0a8bcba0c42"
 KERNEL_DEVICETREE_zynq-zx3-pm3 = "${S}/arch/${ARCH}/boot/dts/zynq-zx3-pm3.dts"
 KERNEL_DEFCONFIG_zynq-zx3-pm3 = "enclustra_zx3_pm3_defconfig"
 
 # enclustra eval board Starter
-SRCREV_zynq-zx3-starter = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
+#SRCREV_zynq-zx3-starter = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
+SRCREV_zynq-zx3-starter = "aa092831fe3322467a4229f9ea30c0a8bcba0c42"
 KERNEL_DEVICETREE_zynq-zx3-starter = "${S}/arch/${ARCH}/boot/dts/zynq-zx3-starter.dts"
 KERNEL_DEFCONFIG_zynq-zx3-starter = "enclustra_zx3_starter_defconfig"
 
@@ -47,6 +51,7 @@ SRC_URI_append = " file://0001-ARM-xilinx-BSP-Support-for-Z4E-Board.patch       
                    file://0014-ARM-xilinx-BSP-Z4E-max-size-for-last-MTD.patch             \
                    file://0015-ARM-xilinx-BSP-remove-eth1-for-ZX3-PM3.patch               \
                    file://0016-ARM-xilinx-BSP-add-dts-and-kernel-config-for-ZX3_Sta.patch \
+                   file://0017-PATCH-ARM-xilinx-BSP-updated-RAM-size-to-512MB.patch       \
                    file://defconfig \
                   "
 

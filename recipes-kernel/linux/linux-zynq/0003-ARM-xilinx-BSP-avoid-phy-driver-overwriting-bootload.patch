@@ -1,7 +1,7 @@
 From fc8713fef1c84169888aa9d9c8f2a9554d54e34b Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 16 Nov 2012 13:57:28 +0100
-Subject: [PATCH 03/16] ARM: xilinx: BSP: avoid phy driver overwriting bootloader settings
+Subject: [PATCH 03/17] ARM: xilinx: BSP: avoid phy driver overwriting bootloader settings
 
 Marvell PHY driver for 1116 is overwriting the timings
 for Gigabit. Comment out

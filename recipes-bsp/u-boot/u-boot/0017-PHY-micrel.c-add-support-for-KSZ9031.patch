@@ -1,7 +1,7 @@
 From 06bf7a8b770b5422311bae20b8f1e48099582c98 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 30 Jan 2013 13:47:32 +0100
-Subject: [PATCH 17/20] PHY: micrel.c: add support for KSZ9031
+Subject: [PATCH 17/21] PHY: micrel.c: add support for KSZ9031
 
 Add support for Micrel PHY KSZ9031 in phylib,
 including small rework for KSZ9021 to avoid code

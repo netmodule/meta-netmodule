@@ -1,7 +1,7 @@
 From b951daeeb76cd1fad0b2f6fa1f09117442f55cf8 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Sat, 8 Dec 2012 10:32:18 +0100
-Subject: [PATCH 07/20] ARM: zynq: I2C: verification needed
+Subject: [PATCH 07/21] ARM: zynq: I2C: verification needed
 
 List of points to verify to fix the I2C block read issue
 
