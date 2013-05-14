@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb \
 PR = "r1"
 
 PV  = "2012.04+xilinx-git" 
-SRC_URI = "git://git.xilinx.com/u-boot-xlnx.git"
+SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git"
 SRCREV = "26786228acfdc0a02190a8d9ca9fcca51a5dcf28"
 
 SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch         \

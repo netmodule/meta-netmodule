@@ -8,7 +8,7 @@ KERNEL_IMAGETYPE = "uImage"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-SRC_URI = "git://git.xilinx.com/linux-xlnx.git"
+SRC_URI = "git://github.com/Xilinx/linux-xlnx.git"
 
 LINUX_VERSION ?= "3.5"
 PV = "3.5+xilinx-git"
