@@ -1,0 +1,31 @@
+From f8796212674a3f6727bea97b505e6a432955f9c8 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Fri, 26 Apr 2013 10:46:28 +0200
+Subject: [PATCH 4/7] zynq: nand: do not wait on erase completion in cmd fct
+
+The chip command function dont have to wait on ERASE
+completion as the dev_ready chip function is defined
+and use of the default nand_erase is made.
+
+This fix the very low NAND erase performance
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ drivers/mtd/nand/xilinx_nandps.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/mtd/nand/xilinx_nandps.c b/drivers/mtd/nand/xilinx_nandps.c
+index 4b140ed5..c2c6586 100644
+--- a/drivers/mtd/nand/xilinx_nandps.c
++++ b/drivers/mtd/nand/xilinx_nandps.c
+@@ -754,7 +754,6 @@ static void xnandps_cmd_function(struct mtd_info *mtd, unsigned int command,
+ 	ndelay(100);
+ 
+ 	if ((command == NAND_CMD_READ0) ||
+-		(command == NAND_CMD_ERASE1) ||
+ 		(command == NAND_CMD_RESET) ||
+ 		(command == NAND_CMD_PARAM) ||
+ 		(command == NAND_CMD_GET_FEATURES)) {
+-- 
+1.7.4.1
+

@@ -1,0 +1,144 @@
+From 9406319fdbe72b18bedfa5e82ac5cc91cbf1c94c Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Mon, 22 Jul 2013 16:32:06 +0200
+Subject: [PATCH 2/7] ze7000: phy: micrel phy init
+
+Add support for the KSZ9031 and use a custom init.
+Each time the PL is loaded, the PHY goes in reset.
+The PHY settings must be done again.
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ drivers/net/phy/micrel.c   |   77 +++++++++++++++++++++++++++++++++++++++++++-
+ include/linux/micrel_phy.h |    1 +
+ 2 files changed, 77 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index b983596..f33aca8 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -48,6 +48,8 @@
+ #define KS8737_CTRL_INT_ACTIVE_HIGH		(1 << 14)
+ #define KSZ8051_RMII_50MHZ_CLK			(1 << 7)
+ 
++#define NETMODULE_ZX3  /* some specific board init */
++
+ static int kszphy_ack_interrupt(struct phy_device *phydev)
+ {
+ 	/* bit[7..0] int status, which is a read and clear register. */
+@@ -102,11 +104,71 @@ static int ks8737_config_intr(struct phy_device *phydev)
+ 	return rc < 0 ? rc : 0;
+ }
+ 
++/*
++ * On the Enclustra ZX3 module,  each FPGA reset leads
++ * to a PHY reset too. So let's do the setup again
++ * @@ netmodule, da
++ */
++static int zx3_config_init(struct phy_device *phydev)
++{
++	int err;
++
++	if (((phydev->phy_id & ~PHY_ID_KSZ9031) & phydev->drv->phy_id_mask) == 0) {
++
++		err = phy_write(phydev, 0xD, 0x0002);
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xE, 0x0008); /* Reg 0x8 */
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xD, 0x4002);
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xE, 0x03FF); /* 3FF = max RXC and TXC delay */
++		if (err < 0)
++			return err;
++	}
++
++	else if (((phydev->phy_id & ~PHY_ID_KSZ9021) & phydev->drv->phy_id_mask) == 0) {
++
++		err = phy_write(phydev, 0xB, 0x8104); /* RGMII clock and control pad skew (reg 260) */
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xC, 0xF0F0);
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xB, 0x8105); /* RGMII RX pad skew (reg 261)*/
++		if (err < 0)
++			return err;
++
++		err = phy_write(phydev, 0xC, 0x0);
++		if (err < 0)
++			return err;
++	}
++	else {
++		printk (KERN_ERR "ZX3 unsupported PHY ID\n");
++	}
++
++	return 0;
++}
++
++
+ static int kszphy_config_init(struct phy_device *phydev)
+ {
++#ifdef NETMODULE_ZX3
++	return zx3_config_init (phydev);
++#else
+ 	return 0;
++#endif
+ }
+ 
++
++
+ static int ksz8021_config_init(struct phy_device *phydev)
+ {
+ 	const u16 val = KSZPHY_OMSO_B_CAST_OFF | KSZPHY_OMSO_RMII_OVERRIDE;
+@@ -237,7 +299,19 @@ static struct phy_driver ksphy_driver[] = {
+ 	.ack_interrupt	= kszphy_ack_interrupt,
+ 	.config_intr	= ksz9021_config_intr,
+ 	.driver		= { .owner = THIS_MODULE, },
+-}, {
++},{
++	.phy_id		= PHY_ID_KSZ9031,
++	.phy_id_mask	= 0x000ffffe,
++	.name		= "Micrel KSZ9031 Gigabit PHY",
++	.features	= PHY_GBIT_FEATURES, /* @NetModule, da, PAUSE disabled, else Gbit not working */
++	.flags		= PHY_HAS_MAGICANEG | PHY_HAS_INTERRUPT,
++	.config_init	= kszphy_config_init,
++	.config_aneg	= genphy_config_aneg,
++	.read_status	= genphy_read_status,
++	.ack_interrupt	= kszphy_ack_interrupt,
++	.config_intr	= ksz9021_config_intr,
++	.driver		= { .owner = THIS_MODULE, },
++},{
+ 	.phy_id		= PHY_ID_KSZ8873MLL,
+ 	.phy_id_mask	= 0x00fffff0,
+ 	.name		= "Micrel KSZ8873MLL Switch",
+@@ -269,6 +343,7 @@ MODULE_AUTHOR("David J. Choi");
+ MODULE_LICENSE("GPL");
+ 
+ static struct mdio_device_id __maybe_unused micrel_tbl[] = {
++	{ PHY_ID_KSZ9031, 0x000ffffe },
+ 	{ PHY_ID_KSZ9021, 0x000ffffe },
+ 	{ PHY_ID_KSZ8001, 0x00ffffff },
+ 	{ PHY_ID_KS8737, 0x00fffff0 },
+diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+index adfe8c0..e009aa4 100644
+--- a/include/linux/micrel_phy.h
++++ b/include/linux/micrel_phy.h
+@@ -17,6 +17,7 @@
+ 
+ #define PHY_ID_KSZ8873MLL	0x000e7237
+ #define PHY_ID_KSZ9021		0x00221610
++#define PHY_ID_KSZ9031		0x00221620
+ #define PHY_ID_KS8737		0x00221720
+ #define PHY_ID_KSZ8021		0x00221555
+ #define PHY_ID_KSZ8041		0x00221510
+-- 
+1.7.4.1
+

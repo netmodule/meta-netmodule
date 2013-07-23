@@ -1,0 +1,66 @@
+From d8485981322f86c9515480b511b16810501160df Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Mon, 22 Jul 2013 16:36:27 +0200
+Subject: [PATCH 3/7] ze7000: phy: adapt marvell settings
+
+The onboard PHY is compatible with the 88E1116R,
+based on the UID at least
+Marvell settings are overwritten to met the board
+requirements
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ arch/arm/boot/dts/ze7000.dts |    2 +-
+ drivers/net/phy/marvell.c    |   19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/ze7000.dts b/arch/arm/boot/dts/ze7000.dts
+index 0f740a4..f8f435f 100644
+--- a/arch/arm/boot/dts/ze7000.dts
++++ b/arch/arm/boot/dts/ze7000.dts
+@@ -198,7 +198,7 @@
+ 				#address-cells = <1>;
+ 				#size-cells = <0>;
+ 				phy1: phy@4 {
+-					compatible = "marvell,88e1118";
++					compatible = "marvell,88e1116R";
+ 					device_type = "ethernet-phy";
+ 					reg = <7>;
+ 				};
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 7a7aad1..0d8a6e6 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -390,11 +390,28 @@ static int m88e1116r_config_init(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 	temp = phy_read(phydev, MII_M1116R_CONTROL_REG_MAC);
+-	temp |= (1 << 5);
++	temp &= ~(1 << 5);  /* @@ NetModule, da, set correct mode for ZE7000 board */
+ 	temp |= (1 << 4);
+ 	err = phy_write(phydev, MII_M1116R_CONTROL_REG_MAC, temp);
+ 	if (err < 0)
+ 		return err;
++
++	/* @@ NetModule, da, LED settings */
++	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 3);
++	if (err < 0)
++		return err;
++
++	temp = 0x1040;
++	err = phy_write(phydev, 16, temp);
++	if (err < 0)
++		return err;
++
++	temp = 0x4405;
++	err = phy_write(phydev, 17, temp);
++	if (err < 0)
++		return err;
++
++
+ 	err = phy_write(phydev, MII_MARVELL_PHY_PAGE, 0);
+ 	if (err < 0)
+ 		return err;
+-- 
+1.7.4.1
+
