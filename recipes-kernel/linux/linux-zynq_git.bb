@@ -1,7 +1,7 @@
 inherit kernel
 require recipes-kernel/linux/linux-dtb.inc
 
-COMPATIBLE_MACHINE = "zynq-zx3-pm3|zynq-zx3-starter|zynq-z4e"
+COMPATIBLE_MACHINE = "zynq-zx3-pm3|zynq-zx3-starter|zynq-ze7000"
 
 KERNEL_IMAGETYPE = "uImage"
 
@@ -15,22 +15,22 @@ PV = "3.5+xilinx-git"
 
 
 
-# enclustra eval board PM3 
+# Enclustra eval board PM3 
 #SRCREV_zynq-zx3-pm3 = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
 SRCREV_zynq-zx3-pm3 = "aa092831fe3322467a4229f9ea30c0a8bcba0c42"
 KERNEL_DEVICETREE_zynq-zx3-pm3 = "${S}/arch/${ARCH}/boot/dts/zynq-zx3-pm3.dts"
 KERNEL_DEFCONFIG_zynq-zx3-pm3 = "enclustra_zx3_pm3_defconfig"
 
-# enclustra eval board Starter
+# Enclustra eval board Starter
 #SRCREV_zynq-zx3-starter = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
 SRCREV_zynq-zx3-starter = "aa092831fe3322467a4229f9ea30c0a8bcba0c42"
 KERNEL_DEVICETREE_zynq-zx3-starter = "${S}/arch/${ARCH}/boot/dts/zynq-zx3-starter.dts"
 KERNEL_DEFCONFIG_zynq-zx3-starter = "enclustra_zx3_starter_defconfig"
 
-# zynq 4 ethernet
-SRCREV_zynq-z4e = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
-KERNEL_DEVICETREE_zynq-z4e = "${S}/arch/${ARCH}/boot/dts/zynq-z4e.dts"
-KERNEL_DEFCONFIG_zynq-z4e = "netmodule_z4e_defconfig"
+# NetModule ZE7000
+SRCREV_zynq-ze7000 = "abfadbffda8e44b4e4a3695b441d10bd82cc0520"
+KERNEL_DEVICETREE_zynq-ze7000 = "${S}/arch/${ARCH}/boot/dts/zynq-z4e.dts"
+KERNEL_DEFCONFIG_zynq-ze7000 = "netmodule_z4e_defconfig"
 
 # make configuration dependent of machine
 FILESEXTRAPATHS_prepend := "${THISDIR}/${P}/${MACHINE}:"

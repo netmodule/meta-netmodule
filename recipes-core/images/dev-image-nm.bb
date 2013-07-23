@@ -39,13 +39,13 @@ inherit core-image
 #generate ramdisk, rootfs and ubi
 IMAGE_FSTYPES := "ext2.gz tar.bz2"
 IMAGE_ROOTFS_SIZE = "32768"
-IMAGE_FSTYPES_zynq-z4e := "ext2.gz tar.bz2 ubi"
+IMAGE_FSTYPES_zynq-ze7000 := "ext2.gz tar.bz2 ubi"
 IMAGE_FSTYPES_zynq-zx3-pm3 := "ext2.gz tar.bz2 ubi"
 IMAGE_FSTYPES_zynq-zx3-starter := "ext2.gz tar.bz2 ubi"
 
 #1023 erase blocks with a size of 126KiB =  something around 125.877 MB
-MKUBIFS_ARGS_zynq-z4e = "-m 2048 -e 126976 -c 4096"
-UBINIZE_ARGS_zynq-z4e = "-m 2048 -p 128KiB"
+MKUBIFS_ARGS_zynq-ze7000 = "-m 2048 -e 126976 -c 4096"
+UBINIZE_ARGS_zynq-ze7000 = "-m 2048 -p 128KiB"
 MKUBIFS_ARGS_zynq-zx3-pm3 = "-m 2048 -e 126976 -c 4096"
 UBINIZE_ARGS_zynq-zx3-pm3 = "-m 2048 -p 128KiB"
 MKUBIFS_ARGS_zynq-zx3-starter = "-m 2048 -e 126976 -c 4096"

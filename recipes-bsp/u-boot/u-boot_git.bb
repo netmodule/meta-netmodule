@@ -36,7 +36,7 @@ UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 
 UBOOT_MACHINE_zynq-zx3-starter = "zx3_starter"
 
-UBOOT_MACHINE_zynq-z4e = "zynq4ethernet"
+UBOOT_MACHINE_zynq-ze7000 = "zynq4ethernet"
                        
 S = "${WORKDIR}/git"
 
