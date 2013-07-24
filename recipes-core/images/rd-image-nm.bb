@@ -7,6 +7,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL += "packagegroup-core-boot \
                 mtd-utils \
+                dhcp-client \
                 ethtool \
                 usbutils \
                 ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
