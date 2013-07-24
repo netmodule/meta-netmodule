@@ -1,0 +1,44 @@
+From 50981a0d24f368990c002f165b91b04edfb35908 Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 24 Jul 2013 15:51:46 +0200
+Subject: [PATCH 8/8] zx3: add fuse support
+
+Add support for FUSE to allow usage of ntfs-3g
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ arch/arm/configs/zx3_pm3_defconfig     |    3 ++-
+ arch/arm/configs/zx3_starter_defconfig |    3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/configs/zx3_pm3_defconfig b/arch/arm/configs/zx3_pm3_defconfig
+index ffe4739..369faf3 100644
+--- a/arch/arm/configs/zx3_pm3_defconfig
++++ b/arch/arm/configs/zx3_pm3_defconfig
+@@ -2249,7 +2249,8 @@ CONFIG_INOTIFY_USER=y
+ # CONFIG_QUOTA is not set
+ # CONFIG_QUOTACTL is not set
+ # CONFIG_AUTOFS4_FS is not set
+-# CONFIG_FUSE_FS is not set
++CONFIG_FUSE_FS=y
++# CONFIG_CUSE is not set
+ 
+ #
+ # Caches
+diff --git a/arch/arm/configs/zx3_starter_defconfig b/arch/arm/configs/zx3_starter_defconfig
+index ffe4739..369faf3 100644
+--- a/arch/arm/configs/zx3_starter_defconfig
++++ b/arch/arm/configs/zx3_starter_defconfig
+@@ -2249,7 +2249,8 @@ CONFIG_INOTIFY_USER=y
+ # CONFIG_QUOTA is not set
+ # CONFIG_QUOTACTL is not set
+ # CONFIG_AUTOFS4_FS is not set
+-# CONFIG_FUSE_FS is not set
++CONFIG_FUSE_FS=y
++# CONFIG_CUSE is not set
+ 
+ #
+ # Caches
+-- 
+1.7.4.1
+
