@@ -27,9 +27,14 @@ IMAGE_INSTALL += "packagegroup-core-boot \
                 nfs-utils \
                 dhcp-client \
                 u-boot-fw-utils \
+                fuse \
+                ntfs-3g \
+                ntfsprogs \
                 ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
                 ${CORE_IMAGE_EXTRA_INSTALL} \
                 "
+
+IMAGE_INSTALL_append = "ntfs-3g ntfsprogs"
 
 IMAGE_LINGUAS = " "
 
