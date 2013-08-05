@@ -40,6 +40,7 @@ SRC_URI_append = " file://0001-ze7000-initial-support-for-board.patch           
                    file://0005-clk-remove-clock-notifier-at-unregister.patch              \
                    file://0006-zx3-pm3-add-board-initial-support.patch                    \
                    file://0007-zx3-starter-initial-board-support.patch                    \
+                   file://0008-zx3-add-fuse-support.patch                                 \
                   "
 
 S = "${WORKDIR}/git"
