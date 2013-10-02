@@ -18,6 +18,13 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 EXTRA_OECONF = "--enable-shared --disable-manuals --with-defaults \
 ${@base_conditional('SITEINFO_ENDIANNESS', 'le', '--with-endianness=little', '--with-endianness=big', d)}"
 
+do_configure_append() {
+    #Disable all PCI stuff, because this crashs at runtime!
+    sed -i 's/#define HAVE_PCI_LOOKUP_NAME 1/\/\/ #define HAVE_PCI_LOOKUP_NAME 1/g' ./include/net-snmp/net-snmp-config.h
+    sed -i 's/#define HAVE_PCI_PCI_H 1/\/\/ #define HAVE_PCI_PCI_H 1/g' ./include/net-snmp/net-snmp-config.h
+}
+
+
 do_install () {
 	oe_runmake install
 }
