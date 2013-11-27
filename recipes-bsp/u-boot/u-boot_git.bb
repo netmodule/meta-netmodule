@@ -6,37 +6,38 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1707d6db1d42237583f50183a5651ecb \
 
 PR = "r1"
 
-PV  = "2012.04+xilinx-git" 
+PV  = "2013.04+xilinx-git" 
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git"
-SRCREV = "26786228acfdc0a02190a8d9ca9fcca51a5dcf28"
+SRCREV = "0f6dbff16b792a106f52ca37f4503335af30601b"
 
-SRC_URI_append += " file://0001-zynq-BSP-support-for-Zynq4Ethernet-Board.patch         \
-                    file://0002-zynq-BSP-support-for-ZX3_PM3-board.patch               \
-                    file://0003-zynq-BSP-QSPI-Flash-and-NAND-muxing.patch              \
-                    file://0004-ARM-xilinx-U-Boot-udelay-1000-FIX.patch                \
-                    file://0005-ARM-zynq-I2C-check-for-transfert-size.patch            \
-                    file://0006-ARM-zynq-I2C-optimize-wait-delay.patch                 \
-                    file://0007-ARM-zynq-I2C-verification-needed.patch                 \
-                    file://0008-ARM-zynq-BSP-add-I2C-for-Z4E-board.patch               \
-                    file://0009-ARM-xilinx-BSP-auto-boot-for-Z4E.patch                 \
-                    file://0010-ARM-xilinx-BSP-UBI-layer.patch                         \
-                    file://0011-ARM-xilinx-BSP-UBI-support-for-ZX3_PM3.patch           \
-                    file://0012-ARM-xilinx-BSP-use-legacy-ETH-driver-for-ZX3_PM3.patch \
-                    file://0013-ARM-xilinx-BSP-Z4E-gets-MAC-addr-from-EERPOM.patch     \
-                    file://0014-ARM-xilinx-BSP-fix-return-value-in-pin-muxing.patch    \
-                    file://0015-ARM-xilinx-BSP-only-board-EEPROM-for-Z4E.patch         \
-                    file://0016-ARM-xilinx-BSP-I2C-support-for-ZX3-PM3.patch           \
-                    file://0017-PHY-micrel.c-add-support-for-KSZ9031.patch             \
-                    file://0018-Z4E-add-board-phy-init.patch                           \
-                    file://0019-zynq-BSP-support-for-ZX3_Starter-board.patch           \
-                    file://0020-z4e-fix-environment-mismatch-after-master-merge.patch  \
-                    file://0021-updated-to-512MB.patch                                 \
-                  "
+SRC_URI_append += " file://0001-zynq-BSP-support-for-ZX3_PM3-board.patch                    \
+                    file://0002-zx3_pm3-added-reconfiguration-to-read-from-QSPI-NAND.patch  \
+                    file://0003-ARM-zynq-I2C-optimize-wait-delay.patch                      \
+                    file://0004-nand-enhance-nand-info-command.patch                        \
+                    file://0005-zynq-nand-Don-t-set-cycles-by-U-boot.patch                  \
+                    file://0006-PHY-micrel.c-add-support-for-KSZ9031.patch                  \
+                    file://0007-zx3_pm3-fixed-SDIO-configuration.patch                      \
+                    file://0008-zx3-nand-setup-pin-muxing-in-front-of-every-access.patch    \
+                    file://0009-qspi-fix-confusing-printout-of-erased-bytes.patch           \
+                    file://0010-zx3_pm3-cleanup-board-environment.patch                     \
+                    file://0011-zx3_pm3-sdhci-changed-pin-muxing-parameters-pullup-f.patch  \
+                    file://0012-sdhci-reduce-clock-speed.patch                              \
+                    file://0013-zx3_pm3-enable-autoboot-in-default-environment.patch        \
+                    file://0014-ze7000-added-board-support-for-ZE7000-board.patch           \
+                    file://0015-zx3-use-a-generic-define-for-all-boards-with-zx3-mod.patch  \
+                    file://0016-zx3-MIO-switching-for-NAND-QSPI-flash-for-all-boards.patch  \
+                    file://0017-zx3_pm3-added-configuration-for-skew-values.patch           \
+                    file://0018-zx3_ze7000-added-configuration-for-skew-values.patch        \
+                    file://0019-zx3_pm3-i2c-adapted-page-write.patch                        \
+                    file://0020-zx3_ze7000-prepared-to-use-eth0-and-eth1-PHY-reset-b.patch  \
+                    file://0021-zynq-BSP-support-for-ZX3_STARTER-board.patch                \
+                    "
+
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
 
 UBOOT_MACHINE_zynq-zx3-starter = "zx3_starter"
 
-UBOOT_MACHINE_zynq-ze7000 = "zynq4ethernet"
+UBOOT_MACHINE_zynq-ze7000 = "zx3_ze7000"
                        
 S = "${WORKDIR}/git"
 

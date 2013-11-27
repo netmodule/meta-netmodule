@@ -1,0 +1,36 @@
+From 4cf63a56a811b5704409a39d2c00f97eb0c3c07b Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Wed, 20 Nov 2013 17:14:09 +0100
+Subject: [PATCH 13/20] zx3_pm3: enable autoboot in default environment
+
+- Bootdelay set to 3s
+- fixed default boot cmd
+---
+ include/configs/zx3_pm3.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 34e0786..1a4b199 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -125,7 +125,7 @@
+         "tftp 0x2000000 ${ramdisk_image};" \
+         "run ramargs;" \
+         "bootm 0x3000000 0x2000000 0x2A00000\0" \
+-    "modeboot=run prodboot\0"
++    "modeboot=prodboot\0"
+ 
+ 
+ #undef CONFIG_ENV_IS_IN_EEPROM
+@@ -150,7 +150,7 @@
+ 
+ 
+ #undef CONFIG_BOOTDELAY
+-#define CONFIG_BOOTDELAY    -1 /* -1 to Disable autoboot */
++#define CONFIG_BOOTDELAY    3 /* -1 to Disable autoboot */
+ 
+ #define CONFIG_SYS_LONGHELP     /* undef to save memory */
+ 
+-- 
+1.7.10.4
+

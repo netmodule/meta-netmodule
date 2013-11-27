@@ -1,0 +1,40 @@
+From e80805dcbb96d4200725896eba07fe872a286a8c Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 21 Nov 2013 12:08:58 +0100
+Subject: [PATCH 15/20] zx3: use a generic define for all boards with zx3
+ module
+
+---
+ include/configs/zx3_pm3.h    |    2 +-
+ include/configs/zx3_ze7000.h |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 1a4b199..5e6d278 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -19,7 +19,7 @@
+ #ifndef __CONFIG_ZX3_PM3_H
+ #define __CONFIG_ZX3_PM3_H
+ 
+-#define CONFIG_ZX3_PM3 /* ZX3 PM3 Board */
++#define CONFIG_ZX3 /* ZX3 CPU Module */
+ 
+ #define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
+ 
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+index 59bc1ad..a641b80 100644
+--- a/include/configs/zx3_ze7000.h
++++ b/include/configs/zx3_ze7000.h
+@@ -18,7 +18,7 @@
+ #ifndef __CONFIG_ZX3_ZE7000_H
+ #define __CONFIG_ZX3_ZE7000_H
+ 
+-#define CONFIG_ZX3_ZE7000 /* ZX3 ZE7000 Board */
++#define CONFIG_ZX3 /* ZX3 CPU Module */
+ 
+ #define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
+ 
+-- 
+1.7.10.4
+

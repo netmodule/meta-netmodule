@@ -1,7 +1,7 @@
-From 06bf7a8b770b5422311bae20b8f1e48099582c98 Mon Sep 17 00:00:00 2001
-From: David Andrey <david.andrey@netmodule.com>
-Date: Wed, 30 Jan 2013 13:47:32 +0100
-Subject: [PATCH 17/21] PHY: micrel.c: add support for KSZ9031
+From df239bc9ec60029fb06bfeeee0acfe35a5dfb88b Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Mon, 16 Sep 2013 14:02:56 +0200
+Subject: [PATCH 06/20] PHY: micrel.c: add support for KSZ9031
 
 Add support for Micrel PHY KSZ9031 in phylib,
 including small rework for KSZ9021 to avoid code
@@ -10,7 +10,7 @@ duplication
 Signed-off-by: David Andrey david.andrey@netmodule.com
 ---
  drivers/net/phy/micrel.c |   83 +++++++++++++++++++++++++++++++++++-----------
- 1 files changed, 63 insertions(+), 20 deletions(-)
+ 1 file changed, 63 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
 index 30f3264..a7d53a1 100644
@@ -139,5 +139,5 @@ index 30f3264..a7d53a1 100644
  	return 0;
  }
 -- 
-1.7.4.1
+1.7.10.4
 

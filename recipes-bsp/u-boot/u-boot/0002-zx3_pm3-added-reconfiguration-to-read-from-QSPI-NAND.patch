@@ -1,0 +1,67 @@
+From 8aef10491f0cf6ddba217a3a2e381de84301f7fa Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Mon, 16 Sep 2013 10:42:36 +0200
+Subject: [PATCH 02/20] zx3_pm3: added reconfiguration to read from QSPI/NAND
+
+U-boot is now able to read from QSPI and NAND.
+Correct Pin Muxing will be set before each access.
+---
+ drivers/mtd/nand/zynq_nand.c |    8 ++++++++
+ drivers/spi/zynq_qspi.c      |    8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/drivers/mtd/nand/zynq_nand.c b/drivers/mtd/nand/zynq_nand.c
+index 84db7dc..87fb98b 100644
+--- a/drivers/mtd/nand/zynq_nand.c
++++ b/drivers/mtd/nand/zynq_nand.c
+@@ -1031,6 +1031,10 @@ static int zynq_nand_check_is_16bit_bw_flash(void)
+ 	return is_16bit_bw;
+ }
+ 
++#if defined (CONFIG_ZX3_PM3)
++extern void zx3_set_storage (int store);
++#endif
++
+ static int zynq_nand_init(struct nand_chip *nand_chip, int devnum)
+ {
+ 	struct zynq_nand_info *xnand;
+@@ -1050,6 +1054,10 @@ static int zynq_nand_init(struct nand_chip *nand_chip, int devnum)
+ 		goto free;
+ 	}
+ 
++#if defined (CONFIG_ZX3_PM3)
++	zx3_set_storage (ZX3_NAND);
++#endif
++
+ 	xnand->nand_base = (void *)ZYNQ_NAND_BASEADDR;
+ 	mtd = &nand_info[0];
+ 
+diff --git a/drivers/spi/zynq_qspi.c b/drivers/spi/zynq_qspi.c
+index 69ea1b2..dbde0be 100644
+--- a/drivers/spi/zynq_qspi.c
++++ b/drivers/spi/zynq_qspi.c
+@@ -947,6 +947,10 @@ void spi_enable_quad_bit(struct spi_slave *spi)
+ 	return;
+ }
+ 
++#if defined (CONFIG_ZX3_PM3)
++extern void zx3_set_storage (int store);
++#endif
++
+ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
+ 		unsigned int max_hz, unsigned int mode)
+ {
+@@ -956,6 +960,10 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
+ 	debug("%s: bus: %d cs: %d max_hz: %d mode: %d\n",
+ 	      __func__, bus, cs, max_hz, mode);
+ 
++#if defined (CONFIG_ZX3_PM3)
++	zx3_set_storage (ZX3_QSPI);
++#endif
++
+ 	if (!spi_cs_is_valid(bus, cs))
+ 		return NULL;
+ 
+-- 
+1.7.10.4
+

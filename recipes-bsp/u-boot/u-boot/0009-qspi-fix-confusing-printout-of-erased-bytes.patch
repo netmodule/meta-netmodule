@@ -1,0 +1,25 @@
+From c4dc7783ded910ed795a0001449a32e3cfc472b1 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 19 Sep 2013 10:42:35 +0200
+Subject: [PATCH 09/20] qspi:  fix confusing printout of erased bytes
+
+---
+ drivers/mtd/spi/spi_flash.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mtd/spi/spi_flash.c b/drivers/mtd/spi/spi_flash.c
+index 488df65..76675b2 100644
+--- a/drivers/mtd/spi/spi_flash.c
++++ b/drivers/mtd/spi/spi_flash.c
+@@ -352,7 +352,7 @@ int spi_flash_cmd_erase(struct spi_flash *flash, u32 offset, size_t len)
+ 		len -= erase_size;
+ 	}
+ 
+-	printf("SF: Successfully erased %zu bytes @ %#x\n", end, start);
++	printf("SF: Successfully erased %zu bytes @ %#x\n", end-start, start);
+ 
+  out:
+ 	spi_release_bus(flash->spi);
+-- 
+1.7.10.4
+

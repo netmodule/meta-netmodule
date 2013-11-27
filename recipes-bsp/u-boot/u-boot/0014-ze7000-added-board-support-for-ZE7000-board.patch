@@ -1,0 +1,646 @@
+From 5ba4e6e501aa99ce335995f659e405586736ce85 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 21 Nov 2013 10:39:01 +0100
+Subject: [PATCH 14/20] ze7000: added board support for ZE7000 board
+
+Added minimal support for the NetModule ZE7000 board.
+This board is equipped with an Enclustra ZX3 CPU module.
+---
+ board/netmodule/ze7000/Makefile |   45 +++++
+ board/netmodule/ze7000/board.c  |  350 +++++++++++++++++++++++++++++++++++++++
+ boards.cfg                      |    1 +
+ include/configs/zx3_ze7000.h    |  201 ++++++++++++++++++++++
+ 4 files changed, 597 insertions(+)
+ create mode 100644 board/netmodule/ze7000/Makefile
+ create mode 100644 board/netmodule/ze7000/board.c
+ create mode 100644 include/configs/zx3_ze7000.h
+
+diff --git a/board/netmodule/ze7000/Makefile b/board/netmodule/ze7000/Makefile
+new file mode 100644
+index 0000000..bc0767a
+--- /dev/null
++++ b/board/netmodule/ze7000/Makefile
+@@ -0,0 +1,45 @@
++#
++# (C) Copyright 2000-2006
++# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
++#
++# See file CREDITS for list of people who contributed to this
++# project.
++#
++# This program is free software; you can redistribute it and/or
++# modify it under the terms of the GNU General Public License as
++# published by the Free Software Foundation; either version 2 of
++# the License, or (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software
++# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
++# MA 02111-1307 USA
++#
++
++include $(TOPDIR)/config.mk
++
++LIB	= $(obj)lib$(BOARD).o
++
++COBJS-y	:= board.o
++
++COBJS	:= $(sort $(COBJS-y))
++
++SRCS	:= $(COBJS:.o=.c)
++OBJS	:= $(addprefix $(obj),$(COBJS))
++
++$(LIB):	$(obj).depend $(OBJS)
++	$(call cmd_link_o_target, $(OBJS))
++
++#########################################################################
++
++# defines $(obj).depend target
++include $(SRCTREE)/rules.mk
++
++sinclude $(obj).depend
++
++#########################################################################
+diff --git a/board/netmodule/ze7000/board.c b/board/netmodule/ze7000/board.c
+new file mode 100644
+index 0000000..21a838d
+--- /dev/null
++++ b/board/netmodule/ze7000/board.c
+@@ -0,0 +1,350 @@
++/*
++ * (C) Copyright 2012 Michal Simek <monstr@monstr.eu>
++ * (C) Copyright 2012 David Andrey <david.andrey@netmodule.com>
++ *
++ * based on Xilinx zynq_common/board.c
++ *
++ * See file CREDITS for list of people who contributed to this
++ * project.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of
++ * the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
++ * MA 02111-1307 USA
++ */
++
++#include <common.h>
++#include <asm/io.h>
++#include <netdev.h>
++#include <zynqpl.h>
++#include <asm/arch/hardware.h>
++#include <asm/arch/sys_proto.h>
++
++#include <nand.h>
++#include <i2c.h>
++
++#define BOOT_MODE_REG     (ZYNQ_SYS_CTRL_BASEADDR + 0x25C)
++#define BOOT_MODES_MASK    0x0000000F
++#define QSPI_MODE         (0x00000001)            /**< QSPI */
++#define NOR_FLASH_MODE    (0x00000002)            /**< NOR  */
++#define NAND_FLASH_MODE   (0x00000004)            /**< NAND */
++#define SD_MODE           (0x00000005)            /**< Secure Digital card */
++#define JTAG_MODE	  (0x00000000)		  /**< JTAG */
++
++extern int zynq_nand_init(struct nand_chip *nand_chip, int devnum);
++
++DECLARE_GLOBAL_DATA_PTR;
++
++#ifdef CONFIG_FPGA
++static Xilinx_desc fpga;
++
++/* It can be done differently */
++static Xilinx_desc fpga010 = XILINX_XC7Z010_DESC(0x10);
++static Xilinx_desc fpga020 = XILINX_XC7Z020_DESC(0x20);
++static Xilinx_desc fpga030 = XILINX_XC7Z030_DESC(0x30);
++static Xilinx_desc fpga045 = XILINX_XC7Z045_DESC(0x45);
++static Xilinx_desc fpga100 = XILINX_XC7Z100_DESC(0x100);
++#endif
++
++int board_init(void)
++{
++#ifdef CONFIG_FPGA
++	u32 idcode;
++
++	idcode = zynq_slcr_get_idcode();
++
++	switch (idcode) {
++	case XILINX_ZYNQ_7010:
++		fpga = fpga010;
++		break;
++	case XILINX_ZYNQ_7020:
++		fpga = fpga020;
++		break;
++	case XILINX_ZYNQ_7030:
++		fpga = fpga030;
++		break;
++	case XILINX_ZYNQ_7045:
++		fpga = fpga045;
++		break;
++	case XILINX_ZYNQ_7100:
++		fpga = fpga100;
++		break;
++	}
++#endif
++
++	/* temporary hack to clear pending irqs before Linux as it
++	 * will hang Linux
++	 */
++	writel(0x26d, 0xe0001014);
++
++	/* temporary hack to take USB out of reset til the is fixed
++	 * in Linux
++	 */
++	writel(0x80, 0xe000a204);
++	writel(0x80, 0xe000a208);
++	writel(0x80, 0xe000a040);
++	writel(0x00, 0xe000a040);
++	writel(0x80, 0xe000a040);
++//	icache_enable();
++
++#ifdef CONFIG_FPGA
++	fpga_init();
++	fpga_add(fpga_xilinx, &fpga);
++#endif
++
++	return 0;
++}
++
++int board_late_init (void)
++{
++#if 0   /* Linux boot mode is not same as FSBL */
++	u32 boot_mode;
++
++	boot_mode = (XIo_In32(BOOT_MODE_REG) & BOOT_MODES_MASK);
++	switch(boot_mode) {
++	case QSPI_MODE:
++		setenv("modeboot", "run qspiboot");
++		break;
++	case NAND_FLASH_MODE:
++		setenv("modeboot", "run nandboot");
++		break;
++	case NOR_FLASH_MODE:
++		setenv("modeboot", "run norboot");
++		break;
++	case SD_MODE:
++		setenv("modeboot", "run sdboot");
++		break;
++	case JTAG_MODE:
++		setenv("modeboot", "run jtagboot");
++		break;
++	default:
++		setenv("modeboot", "");
++		break;
++	}
++#endif
++
++	return 0;
++}
++
++/**
++ * Set pin muxing for NAND access
++ */
++static void set_mio_mux_nand( void ){
++#define NANDMUX0 0x0000001610
++#define NANDMUX  0x0000000610
++
++	writel(0xDF0D, &slcr_base->slcr_unlock);	//unlock slcr
++
++	/* Define MuxIO for NAND */
++	/* Caution: overwrite some QSPI muxing !!! */
++	writel(NANDMUX0, &slcr_base->mio_pin[0]);	/* Pin 0, NAND Flash Chip Select */
++	writel(NANDMUX,  &slcr_base->mio_pin[2]);	/* Pin 2, NAND Flash ALEn */
++	writel(NANDMUX,  &slcr_base->mio_pin[3]);	/* Pin 3, NAND WE_B */
++	writel(NANDMUX,  &slcr_base->mio_pin[4]);	/* Pin 4, NAND Flash IO Bit 2 */
++	writel(NANDMUX,  &slcr_base->mio_pin[5]);	/* Pin 5, NAND Flash IO Bit 0 */
++	writel(NANDMUX,  &slcr_base->mio_pin[6]);	/* Pin 6, NAND Flash IO Bit 1 */
++	writel(NANDMUX,  &slcr_base->mio_pin[7]);	/* Pin 7, NAND Flash CLE_B */
++	writel(NANDMUX,  &slcr_base->mio_pin[8]);	/* Pin 8, NAND Flash RD_B */
++	writel(NANDMUX,  &slcr_base->mio_pin[9]);	/* Pin 9, NAND Flash IO Bit 4 */
++	writel(NANDMUX,  &slcr_base->mio_pin[10]);	/* Pin 10, NAND Flash IO Bit 5 */
++	writel(NANDMUX,  &slcr_base->mio_pin[11]);	/* Pin 11, NAND Flash IO Bit 6 */
++	writel(NANDMUX,  &slcr_base->mio_pin[12]);	/* Pin 12, NAND Flash IO Bit 7 */
++	writel(NANDMUX,  &slcr_base->mio_pin[13]);	/* Pin 13, NAND Flash IO Bit 3 */
++	writel(NANDMUX,  &slcr_base->mio_pin[14]);	/* Pin 14, NAND Flash Busy */
++
++	writel(0x767B, &slcr_base->slcr_lock);		//lock slcr
++}
++
++
++/**
++ * Set the pin muxing for QSPI NOR access
++ */
++static void set_mio_mux_qspi( void ){
++#define QSPIMUX 0x0000000602
++
++	writel(0xDF0D, &slcr_base->slcr_unlock);		//unlock slcr
++
++	/* Define MuxIO for QSPI */
++	/* Caution: overwrite some NAND muxing !!! */
++	writel(0x00001600, &slcr_base->mio_pin[0]);		/* Pin 0, Level 3 Mux */
++	writel(0x00001602, &slcr_base->mio_pin[1]);		/* Pin 1, Quad SPI 0 Chip Select */
++	writel(QSPIMUX,    &slcr_base->mio_pin[2]);		/* Pin 2, Quad SPI 0 IO Bit 0 */
++	writel(QSPIMUX,    &slcr_base->mio_pin[3]);		/* Pin 3, Quad SPI 0 IO Bit 1 */
++	writel(QSPIMUX,    &slcr_base->mio_pin[4]);		/* Pin 4, Quad SPI 0 IO Bit 2 */
++	writel(QSPIMUX,    &slcr_base->mio_pin[5]);		/* Pin 5, Quad SPI 0 IO Bit 3 */
++	writel(QSPIMUX,    &slcr_base->mio_pin[6]);		/* Pin 6, Quad SPI 0 Clock */
++	writel(QSPIMUX,    &slcr_base->mio_pin[7]);		/* Pin 7, Reserved*/
++	writel(QSPIMUX,    &slcr_base->mio_pin[8]);		/* Pin 8, Quad SPI Feedback Clock */
++	writel(0x00001600, &slcr_base->mio_pin[9]);		/* Pin 9, Level mux -> disable */
++	writel(0x00001600, &slcr_base->mio_pin[10]);	/* Pin 10, Level mux -> disable */
++	writel(0x00001600, &slcr_base->mio_pin[11]);	/* Pin 11, Level mux -> disable */
++	writel(0x00001600, &slcr_base->mio_pin[12]);	/* Pin 12, Level mux -> disable */
++	writel(0x00001600, &slcr_base->mio_pin[13]);	/* Pin 13, Level mux -> disable */
++	writel(0x00001600, &slcr_base->mio_pin[14]);	/* Pin 14, Level mux -> disable */
++
++	writel(0x767B, &slcr_base->slcr_lock);			//lock slcr
++}
++
++static int zx3_current_storage = ZX3_NONE;
++
++void zx3_set_storage (int store) {
++	debug("zx3_set_storage: from %u to %u\n", zx3_current_storage, store);
++
++	if (store == zx3_current_storage)
++		return;
++
++	switch (store)
++	{
++		case ZX3_NAND:
++			set_mio_mux_nand ();
++			zx3_current_storage = ZX3_NAND;
++			break;
++		case ZX3_QSPI:
++			set_mio_mux_qspi();
++			zx3_current_storage = ZX3_QSPI;
++			break;
++		default:
++			zx3_current_storage = ZX3_NONE;
++			break;
++	}
++}
++
++#ifdef CONFIG_CMD_NET
++/**
++ * Read the MAC address in the module EEPROM
++ */
++int zx3_read_mac_address(uint8_t *buf, uint8_t index)
++{
++	/* we have only two interfaces */
++	if (index > 1)
++	return 0;
++
++	/* Read MAC address. */
++	if (i2c_read(ZX3_SHA_EEPROM_ADDR, ZX3_SHA_EEPROM_MAC_OFFSET,
++					ZX3_SHA_EEPROM_ADDR_LEN, (uint8_t *) &buf[0], 6) == 0) {
++
++		/* only the MAC 0 is stored, but the second is reserved, so add index value */
++		buf[5] += index;
++
++		/* Check that MAC address is valid. */
++		if (is_valid_ether_addr(buf)) {
++			return 1; /* Found */
++		}
++		else {
++			printf ("Invalid MAC stored in EEPROM for interface %d\n", index);
++			return 0;
++		}
++	}
++	else {
++		printf("Read from Module EEPROM @ 0x%02x failed\n",
++				ZX3_SHA_EEPROM_ADDR);
++		return 0;
++	}
++
++}
++
++int board_eth_init(bd_t *bis)
++{
++	u32 ret = 0;
++	u_int8_t mac[6];
++
++	if (zx3_read_mac_address (mac, 0)) {
++		int err;
++
++		/* set address env if not already set */
++		err = eth_setenv_enetaddr("ethaddr", mac);
++		if (err)
++			printf("Failed to set MAC address 0 from EEPROM to env.\n");
++	}
++
++
++#ifdef CONFIG_XILINX_AXIEMAC
++	ret |= xilinx_axiemac_initialize(bis, XILINX_AXIEMAC_BASEADDR,
++						XILINX_AXIDMA_BASEADDR);
++#endif
++#ifdef CONFIG_XILINX_EMACLITE
++	u32 txpp = 0;
++	u32 rxpp = 0;
++# ifdef CONFIG_XILINX_EMACLITE_TX_PING_PONG
++	txpp = 1;
++# endif
++# ifdef CONFIG_XILINX_EMACLITE_RX_PING_PONG
++	rxpp = 1;
++# endif
++	ret |= xilinx_emaclite_initialize(bis, XILINX_EMACLITE_BASEADDR,
++			txpp, rxpp);
++#endif
++
++#if defined(CONFIG_ZYNQ_GEM)
++# if defined(CONFIG_ZYNQ_GEM0)
++	ret |= zynq_gem_initialize(bis, ZYNQ_GEM_BASEADDR0,
++						CONFIG_ZYNQ_GEM_PHY_ADDR0, 0);
++# endif
++# if defined(CONFIG_ZYNQ_GEM1)
++	ret |= zynq_gem_initialize(bis, ZYNQ_GEM_BASEADDR1,
++						CONFIG_ZYNQ_GEM_PHY_ADDR1, 0);
++# endif
++#endif
++
++	return ret;
++}
++#endif
++
++/**
++ * Set the pin muxing for QSPI NOR access
++ */
++#ifdef CONFIG_ZYNQ_SDHCI0
++static void set_mio_mux_sdio0( void ){
++//#define MUXPINVALUE 0x00000680
++#define MUXPINVALUE 0x00001780
++
++    writel(0xDF0D, &slcr_base->slcr_unlock);        //unlock slcr
++
++    writel(MUXPINVALUE, &slcr_base->mio_pin[40]);     /* Pin 40, SD0.CLK */
++    writel(MUXPINVALUE, &slcr_base->mio_pin[41]);     /* Pin 41, SD0.CMD */
++    writel(MUXPINVALUE, &slcr_base->mio_pin[42]);     /* Pin 42, SD0.D0 */
++    writel(MUXPINVALUE, &slcr_base->mio_pin[43]);     /* Pin 43, SD0.D1 */
++    writel(MUXPINVALUE, &slcr_base->mio_pin[44]);     /* Pin 44, SD0.D2 */
++    writel(MUXPINVALUE, &slcr_base->mio_pin[45]);     /* Pin 45, SD0.D3 */
++
++    writel(0x2001, &slcr_base->reserved1[2]);         /* Set SDHCI clock to 32 MHz */
++
++    writel(0x767B, &slcr_base->slcr_lock);          //lock slcr
++}
++#endif
++
++#ifdef CONFIG_CMD_MMC
++int board_mmc_init(bd_t *bd)
++{
++    int ret = 0;
++
++# if defined(CONFIG_ZYNQ_SDHCI0)
++    set_mio_mux_sdio0();
++    ret = zynq_sdhci_init(ZYNQ_SDHCI_BASEADDR0);
++# endif
++# if defined(CONFIG_ZYNQ_SDHCI1)
++    ret |= zynq_sdhci_init(ZYNQ_SDHCI_BASEADDR1);
++# endif
++    return ret;
++}
++#endif
++
++int dram_init(void)
++{
++	gd->ram_size = get_ram_size((void *)CONFIG_SYS_SDRAM_BASE,
++							CONFIG_SYS_SDRAM_SIZE);
++	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
++	gd->bd->bi_dram[0].size = CONFIG_SYS_SDRAM_SIZE;
++
++	return 0;
++}
+diff --git a/boards.cfg b/boards.cfg
+index 0b89400..34119d8 100644
+--- a/boards.cfg
++++ b/boards.cfg
+@@ -309,6 +309,7 @@ zynq_zed                     arm         armv7       zynq                xilinx
+ omap5_uevm                   arm         armv7       omap5_uevm          ti		omap5
+ dra7xx_evm		     arm	 armv7	     dra7xx		 ti	        omap5
+ zx3_pm3                      arm         armv7       zx3_pm3             enclustra      zynq
++zx3_ze7000                   arm         armv7       ze7000          netmodule      zynq
+ s5p_goni                     arm         armv7       goni                samsung        s5pc1xx
+ smdkc100                     arm         armv7       smdkc100            samsung        s5pc1xx
+ origen			     arm	 armv7	     origen		 samsung	exynos
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+new file mode 100644
+index 0000000..59bc1ad
+--- /dev/null
++++ b/include/configs/zx3_ze7000.h
+@@ -0,0 +1,201 @@
++/*
++ * (C) Copyright 2012 Xilinx
++ *
++ * Configuration for Zynq Evaluation and Development Board - ZedBoard
++ * See zynq_common.h for Zynq common configs
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of
++ * the License, or (at your option) any later version.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
++ * MA 02111-1307 USA
++ */
++
++#ifndef __CONFIG_ZX3_ZE7000_H
++#define __CONFIG_ZX3_ZE7000_H
++
++#define CONFIG_ZX3_ZE7000 /* ZX3 ZE7000 Board */
++
++#define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
++
++#define CONFIG_ZYNQ_SERIAL_UART0
++
++#define CONFIG_ZYNQ_GEM0
++#undef CONFIG_ZYNQ_GEM1     //@@@as
++#define CONFIG_PHY_MARVEL
++#define CONFIG_PHY_MICREL
++#define CONFIG_ZYNQ_GEM_PHY_ADDR0        3
++#define CONFIG_ZYNQ_GEM_PHY_ADDR1        7
++#define CONFIG_ZYNQ_GEM_PHY_ADDR1_ADD1   6
++#define CONFIG_ZYNQ_GEM_PHY_ADDR1_ADD2   5
++#define CONFIG_ZYNQ_GEM_PHY_ADDR1_ADD3   4
++
++#define CONFIG_CMD_NET
++#define CONFIG_CMD_MII      /* mii utils */
++
++#define CONFIG_SYS_NO_FLASH /* No NOR flash mounted */
++#define CONFIG_ZYNQ_SPI     /* SPI Flash is equipped */
++#define CONFIG_NAND_ZYNQ    /* NAND Flash is equipped*/
++
++#define CONFIG_ZYNQ_SDHCI0  //@@@as:
++#define CONFIG_MMC          //@@@as:
++
++/* Select which flash type currently uses Pins */
++#define ZX3_NONE    (0)
++#define ZX3_NAND    (1)
++#define ZX3_QSPI    (2)
++
++
++#define CONFIG_CMD_MTDPARTS
++#define CONFIG_MTD_PARTITIONS
++#define CONFIG_RBTREE
++#define CONFIG_CMD_UBI
++
++#define MTDIDS_DEFAULT          "nand0=nand"
++#define MTDPARTS_DEFAULT        "mtdparts=" \
++                                "nand:5m(nand-linux)," \
++                                "1m(nand-device-tree)," \
++                                "-(nand-rootfs)"
++
++
++#include <configs/zynq_common.h>
++
++// QSPI Flash Memory Map
++#define QSPI_BOOT_OFFSET          0x00000000   // Storage for Bootimage (FSBL, FPGA Bitstream, UBoot)
++#define QSPI_BOOT_SIZE            0x00600000   // size 6MB
++#define QSPI_RESCUELINUX_OFFSET   0x00600000   // Storage for Linux Kernel
++#define QSPI_RESCUELINUX_SIZE     0x00300000   // size 3MB
++#define QSPI_RESCUEDTB_OFFSET     0x00900000   // Storage for Linux Devicetree
++#define QSPI_RESCUEDTB_SIZE       0x00080000   // size 512kB
++#define QSPI_BOOTARGS_OFFSET      0x00980000   // Storage for Uboot Environment
++#define QSPI_BOOTARGS_SIZE        0x00080000   // size 512kB
++#define QSPI_RESCUEROOTFS_OFFSET  0x00A00000   // Storage for Linux Root FS
++#define QSPI_RESCUEROOTFS_SIZE    0x00600000   // size 6MB
++
++#define STRINGIFY_PRE(x)   #x
++#define STRINGIFY(x)   STRINGIFY_PRE(x)
++
++#undef CONFIG_EXTRA_ENV_SETTINGS
++#define CONFIG_EXTRA_ENV_SETTINGS   \
++    "loadaddr=0x200000\0"   \
++    "ethaddr=00:11:2b:00:00:01\0"   \
++    "ipaddr=192.168.1.1\0"   \
++    "netmask=255.255.255.0\0"   \
++    "kernel_image=uImage\0" \
++    "ramdisk_image=uramdisk.image.gz\0" \
++    "devicetree_image=uImage-zx3-ze7000.dtb\0" \
++    "ramdisk_size=" STRINGIFY(QSPI_RESCUEROOTFS_SIZE) "\0"   \
++    "nand_kernel_size=0x500000\0"   \
++    "kernel_size=" STRINGIFY(QSPI_RESCUELINUX_SIZE) "\0"    \
++    "nand_devicetree_size=0x10000\0" \
++    "devicetree_size=" STRINGIFY(QSPI_RESCUEDTB_SIZE) "\0" \
++    "fdt_high=0x20000000\0" \
++    "initrd_high=0x20000000\0"  \
++    "mtdids=" MTDIDS_DEFAULT "\0"    \
++    "mtdparts=" MTDPARTS_DEFAULT "\0" \
++    "nandargs=setenv bootargs console=ttyPS0,115200 " \
++        "root=ubi0:ubi-rootfs rw " \
++        "rootfstype=ubifs " \
++        "ubi.mtd=nand-rootfs " \
++        "ip=:::::eth0:off " \
++        "$othbootargs " \
++        "earlyprintk\0" \
++    "ramargs=setenv bootargs console=ttyPS0,115200 " \
++        "root=/dev/ram rw " \
++        "ip=:::::eth0:off " \
++        "$othbootargs " \
++        "earlyprintk\0" \
++    "prodboot=echo Booting on NAND...;" \
++        "nand device 0;" \
++        "ubi part nand-linux;" \
++        "ubi read 0x3000000 kernel ${nand_kernel_size};" \
++        "ubi part nand-device-tree;" \
++        "ubi read 0x2A00000 dtb ${nand_devicetree_size};" \
++        "run nandargs;" \
++        "bootm 0x3000000 - 0x2A00000\0" \
++    "rescboot=echo Booting on QSPI Flash...;" \
++        "sf probe;" \
++        "sf read 0x3000000 " STRINGIFY(QSPI_RESCUELINUX_OFFSET) " ${kernel_size};" \
++        "sf read 0x2A00000 " STRINGIFY(QSPI_RESCUEDTB_OFFSET) " ${devicetree_size};" \
++        "sf read 0x2000000 " STRINGIFY(QSPI_RESCUEROOTFS_OFFSET) " ${ramdisk_size};" \
++        "nand device 0;" \
++        "run ramargs;" \
++        "bootm 0x3000000 0x2000000 0x2A00000;\0" \
++    "jtagboot=echo Booting on TFTP...;" \
++        "tftp 0x3000000 ${kernel_image};" \
++        "tftp 0x2A00000 ${devicetree_image};" \
++        "tftp 0x2000000 ${ramdisk_image};" \
++        "run ramargs;" \
++        "bootm 0x3000000 0x2000000 0x2A00000\0" \
++    "modeboot=prodboot\0"
++
++
++#undef CONFIG_ENV_IS_IN_EEPROM
++#undef CONFIG_ENV_IS_IN_NAND
++#undef CONFIG_ENV_IS_IN_FLASH
++#undef CONFIG_ENV_IS_IN_SPI_FLASH
++
++/* NAND */
++#ifdef CONFIG_NAND_ZYNQ
++# define CONFIG_SYS_NAND_BASE       ZYNQ_NAND_BASEADDR
++#endif
++
++/* SPI */
++#ifdef CONFIG_ZYNQ_SPI
++# define CONFIG_ENV_IS_IN_SPI_FLASH
++# undef  CONFIG_ENV_OFFSET
++# define CONFIG_ENV_OFFSET          QSPI_BOOTARGS_OFFSET  /* Uboot Environment saved in SPI Flash */
++# define CONFIG_CMD_SF_TEST
++#else
++# define CONFIG_ENV_IS_NOWHERE
++#endif
++
++
++#undef CONFIG_BOOTDELAY
++#define CONFIG_BOOTDELAY    3 /* -1 to Disable autoboot */
++
++#define CONFIG_SYS_LONGHELP     /* undef to save memory */
++
++#undef CONFIG_SYS_MAXARGS
++#define CONFIG_SYS_MAXARGS 32
++
++#undef CONFIG_ZYNQ_SERIAL_CLOCK0
++#define CONFIG_ZYNQ_SERIAL_CLOCK0 0x5f5e100
++
++#undef CONFIG_IPADDR
++#undef CONFIG_SERVERIP
++
++#undef CONFIG_SYS_PROMPT
++#define CONFIG_SYS_PROMPT   "zx3-ze7000> "
++
++/**
++ * I2C support
++ */
++#define CONFIG_CMD_I2C
++#define CONFIG_ZYNQ_I2C                     /* Support for Zynq I2C */
++#define CONFIG_HARD_I2C                     /* I2C with hardware support */
++#define CONFIG_ZYNQ_I2C0                    /* Enable I2C_0 */
++#define CONFIG_SYS_I2C_SPEED        100000  /* I2C speed and slave address */
++
++/**
++ * I2C SHA-EEPROM (on ZX3 module)
++ */
++#define ZX3_SHA_EEPROM_ADDR       (0x5C)
++#define ZX3_SHA_EEPROM_ADDR_LEN   (0x01)
++#define ZX3_SHA_EEPROM_MAC_OFFSET (0x10)
++
++/**
++ * I2C EEPROM (on PM3 Baseboard)
++ */
++#define CONFIG_CMD_EEPROM
++#define CONFIG_SYS_I2C_EEPROM_ADDR              0x54
++#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN          2
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS       5   /* 5 bits = 32 bytes */ //@@@as
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS   10
++#undef  CONFIG_SYS_I2C_MULTI_EEPROMS                /* consider only the board EEPROM */
++
++#endif /* __CONFIG_ZX3_ZE7000_H */
+-- 
+1.7.10.4
+

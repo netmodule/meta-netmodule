@@ -1,0 +1,79 @@
+From 7df92a6fa4c3a2f33786a159eeeea6e549ea1f27 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 19 Sep 2013 10:41:18 +0200
+Subject: [PATCH 08/20] zx3: nand: setup pin muxing in front of every access
+
+---
+ board/enclustra/zx3_pm3/board.c |    1 +
+ common/cmd_nand.c               |   15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index c6bed1a..8d5f8b4 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -198,6 +198,7 @@ static void set_mio_mux_qspi( void ){
+ static int zx3_current_storage = ZX3_NONE;
+ 
+ void zx3_set_storage (int store) {
++	debug("zx3_set_storage: from %u to %u\n", zx3_current_storage, store);
+ 
+ 	if (store == zx3_current_storage)
+ 		return;
+diff --git a/common/cmd_nand.c b/common/cmd_nand.c
+index 74f40cc..fc4216c 100644
+--- a/common/cmd_nand.c
++++ b/common/cmd_nand.c
+@@ -28,6 +28,10 @@
+ #include <jffs2/jffs2.h>
+ #include <nand.h>
+ 
++#if defined (CONFIG_ZX3_PM3)
++extern void zx3_set_storage (int store);
++#endif
++
+ #if defined(CONFIG_CMD_MTDPARTS)
+ 
+ /* partition handling routines */
+@@ -376,7 +380,6 @@ static void nand_print_and_set_info(int idx)
+ {
+ 	nand_info_t *nand = &nand_info[idx];
+ 	struct nand_chip *chip = nand->priv;
+-	char buf[32];
+ 	ulong eccbyte;
+ 
+ 	printf("Device %d: ", idx);
+@@ -442,6 +445,7 @@ static int raw_access(nand_info_t *nand, ulong addr, loff_t off, ulong count,
+ 	return ret;
+ }
+ 
++
+ static int do_nand(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ {
+ 	int i, ret = 0;
+@@ -467,6 +471,10 @@ static int do_nand(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ 
+ 	cmd = argv[1];
+ 
++#if defined (CONFIG_ZX3_PM3)
++    zx3_set_storage (ZX3_NAND);
++#endif
++
+ 	/* Only "dump" is repeatable. */
+ 	if (repeat && strcmp(cmd, "dump"))
+ 		return 0;
+@@ -970,6 +978,11 @@ static int do_nandboot(cmd_tbl_t *cmdtp, int flag, int argc,
+ 	struct part_info *part;
+ 	u8 pnum;
+ 
++
++#if defined (CONFIG_ZX3_PM3)
++    zx3_set_storage (ZX3_NAND);
++#endif
++
+ 	if (argc >= 2) {
+ 		char *p = (argc == 2) ? argv[1] : argv[2];
+ 		if (!(str2long(p, &addr)) && (mtdparts_init() == 0) &&
+-- 
+1.7.10.4
+

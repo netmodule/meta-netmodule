@@ -1,0 +1,25 @@
+From 03ad37689a5b202a46b405109b159248cddb4516 Mon Sep 17 00:00:00 2001
+From: Marcel Reichmuth <marcel.reichmuth@netmodule.com>
+Date: Fri, 4 Oct 2013 11:27:37 +0200
+Subject: [PATCH 12/20] sdhci: reduce clock speed
+
+---
+ board/enclustra/zx3_pm3/board.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index 94d918f..21a838d 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -317,6 +317,8 @@ static void set_mio_mux_sdio0( void ){
+     writel(MUXPINVALUE, &slcr_base->mio_pin[44]);     /* Pin 44, SD0.D2 */
+     writel(MUXPINVALUE, &slcr_base->mio_pin[45]);     /* Pin 45, SD0.D3 */
+ 
++    writel(0x2001, &slcr_base->reserved1[2]);         /* Set SDHCI clock to 32 MHz */
++
+     writel(0x767B, &slcr_base->slcr_lock);          //lock slcr
+ }
+ #endif
+-- 
+1.7.10.4
+

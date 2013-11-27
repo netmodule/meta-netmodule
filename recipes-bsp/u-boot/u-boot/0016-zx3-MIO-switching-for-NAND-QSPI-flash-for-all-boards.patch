@@ -1,0 +1,90 @@
+From 688f700861985e7b6dd5648f0c842d9c90fc3c3b Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 21 Nov 2013 12:10:14 +0100
+Subject: [PATCH 16/20] zx3: MIO switching for NAND/QSPI flash for all boards
+ with zx3 module
+
+---
+ common/cmd_nand.c            |    6 +++---
+ drivers/mtd/nand/zynq_nand.c |    4 ++--
+ drivers/spi/zynq_qspi.c      |    4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/common/cmd_nand.c b/common/cmd_nand.c
+index fc4216c..64d5bcc 100644
+--- a/common/cmd_nand.c
++++ b/common/cmd_nand.c
+@@ -28,7 +28,7 @@
+ #include <jffs2/jffs2.h>
+ #include <nand.h>
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+ extern void zx3_set_storage (int store);
+ #endif
+ 
+@@ -471,7 +471,7 @@ static int do_nand(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ 
+ 	cmd = argv[1];
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+     zx3_set_storage (ZX3_NAND);
+ #endif
+ 
+@@ -979,7 +979,7 @@ static int do_nandboot(cmd_tbl_t *cmdtp, int flag, int argc,
+ 	u8 pnum;
+ 
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+     zx3_set_storage (ZX3_NAND);
+ #endif
+ 
+diff --git a/drivers/mtd/nand/zynq_nand.c b/drivers/mtd/nand/zynq_nand.c
+index 11fdb2b..9322cc5 100644
+--- a/drivers/mtd/nand/zynq_nand.c
++++ b/drivers/mtd/nand/zynq_nand.c
+@@ -1031,7 +1031,7 @@ static int zynq_nand_check_is_16bit_bw_flash(void)
+ 	return is_16bit_bw;
+ }
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+ extern void zx3_set_storage (int store);
+ #endif
+ 
+@@ -1054,7 +1054,7 @@ static int zynq_nand_init(struct nand_chip *nand_chip, int devnum)
+ 		goto free;
+ 	}
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+ 	zx3_set_storage (ZX3_NAND);
+ #endif
+ 
+diff --git a/drivers/spi/zynq_qspi.c b/drivers/spi/zynq_qspi.c
+index dbde0be..8fa4573 100644
+--- a/drivers/spi/zynq_qspi.c
++++ b/drivers/spi/zynq_qspi.c
+@@ -947,7 +947,7 @@ void spi_enable_quad_bit(struct spi_slave *spi)
+ 	return;
+ }
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+ extern void zx3_set_storage (int store);
+ #endif
+ 
+@@ -960,7 +960,7 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
+ 	debug("%s: bus: %d cs: %d max_hz: %d mode: %d\n",
+ 	      __func__, bus, cs, max_hz, mode);
+ 
+-#if defined (CONFIG_ZX3_PM3)
++#if defined (CONFIG_ZX3)
+ 	zx3_set_storage (ZX3_QSPI);
+ #endif
+ 
+-- 
+1.7.10.4
+

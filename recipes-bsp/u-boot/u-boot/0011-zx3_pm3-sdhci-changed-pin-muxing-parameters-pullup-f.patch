@@ -1,0 +1,27 @@
+From 54fa7e4caedff79c60323fb8776f08dbf4a19f7a Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Mon, 30 Sep 2013 13:04:32 +0200
+Subject: [PATCH 11/20] zx3_pm3: sdhci: changed pin muxing parameters (pullup
+ & fast)
+
+---
+ board/enclustra/zx3_pm3/board.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index d356ac0..94d918f 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -305,7 +305,8 @@ int board_eth_init(bd_t *bis)
+  */
+ #ifdef CONFIG_ZYNQ_SDHCI0
+ static void set_mio_mux_sdio0( void ){
+-#define MUXPINVALUE 0x0000000680
++//#define MUXPINVALUE 0x00000680
++#define MUXPINVALUE 0x00001780
+ 
+     writel(0xDF0D, &slcr_base->slcr_unlock);        //unlock slcr
+ 
+-- 
+1.7.10.4
+

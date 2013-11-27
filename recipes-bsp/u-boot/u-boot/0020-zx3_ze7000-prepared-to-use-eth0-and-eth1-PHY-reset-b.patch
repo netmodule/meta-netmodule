@@ -1,0 +1,304 @@
+From 769ab7e0cb613e76c5a26fa2dd92d864efc652fb Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Wed, 27 Nov 2013 11:54:02 +0100
+Subject: [PATCH 20/20] zx3_ze7000: prepared to use eth0 and eth1, PHY reset
+ by FPGA
+
+Uboot is prepared to use eth0 and eth0. The FPGA controls the
+reset of the PHYs.
+---
+ board/netmodule/ze7000/board.c |  153 ++++++++++++++++++++--------------------
+ include/configs/zx3_ze7000.h   |   49 ++++++++++---
+ 2 files changed, 117 insertions(+), 85 deletions(-)
+
+diff --git a/board/netmodule/ze7000/board.c b/board/netmodule/ze7000/board.c
+index c7c9a2f..b4a8f42 100644
+--- a/board/netmodule/ze7000/board.c
++++ b/board/netmodule/ze7000/board.c
+@@ -57,6 +57,8 @@ static Xilinx_desc fpga045 = XILINX_XC7Z045_DESC(0x45);
+ static Xilinx_desc fpga100 = XILINX_XC7Z100_DESC(0x100);
+ #endif
+ 
++#define __REG(x)        (*((volatile u32 *)(x)))
++
+ int board_init(void)
+ {
+ #ifdef CONFIG_FPGA
+@@ -108,32 +110,27 @@ int board_init(void)
+ 
+ int board_late_init (void)
+ {
+-#if 0   /* Linux boot mode is not same as FSBL */
+-	u32 boot_mode;
++    unsigned int fpgaVersion;
++    unsigned int phyControl;
+ 
+-	boot_mode = (XIo_In32(BOOT_MODE_REG) & BOOT_MODES_MASK);
+-	switch(boot_mode) {
+-	case QSPI_MODE:
+-		setenv("modeboot", "run qspiboot");
+-		break;
+-	case NAND_FLASH_MODE:
+-		setenv("modeboot", "run nandboot");
+-		break;
+-	case NOR_FLASH_MODE:
+-		setenv("modeboot", "run norboot");
+-		break;
+-	case SD_MODE:
+-		setenv("modeboot", "run sdboot");
+-		break;
+-	case JTAG_MODE:
+-		setenv("modeboot", "run jtagboot");
+-		break;
+-	default:
+-		setenv("modeboot", "");
+-		break;
+-	}
+-#endif
++    puts("FPGA:  ");
++    fpgaVersion = __REG(CONFIG_FPGA_VERSION_REG);
++    printf("v%d.%d\n", (fpgaVersion & CONFIG_FPGA_VERSION_MAJOR_MASK) >> CONFIG_FPGA_VERSION_MAJOR_FSB,
++                       (fpgaVersion & CONFIG_FPGA_VERSION_MINOR_MASK) >> CONFIG_FPGA_VERSION_MINOR_FSB);
++
++#ifdef CONFIG_ZYNQ_GEM0
++    /* Release Phy reset for eth0 */
++    phyControl = __REG(CONFIG_FPGA_PHYCTRL_REG);
++    __REG(CONFIG_FPGA_PHYCTRL_REG) = phyControl & ~CONFIG_FPGA_PHYCTRL_MODPHY_MASK;
+ 
++    udelay(100);
++#endif
++#ifdef CONFIG_ZYNQ_GEM1
++    /* Release Phy reset for eth1 */
++    phyControl = __REG(CONFIG_FPGA_PHYCTRL_REG);
++    __REG(CONFIG_FPGA_PHYCTRL_REG) = phyControl & ~CONFIG_FPGA_PHYCTRL_PHYD_MASK;
++    udelay(100);
++#endif
+ 	return 0;
+ }
+ 
+@@ -223,59 +220,49 @@ void zx3_set_storage (int store) {
+ #ifdef CONFIG_CMD_NET
+ int board_phy_config(struct phy_device *phydev)
+ {
+-	static int do_once;
+-
+-	if (!do_once) {
+-		/* first interface, on module */
+-		if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR0) {
+-			/* Giga skew value */
+-			if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
+-				phy_write(phydev, phydev->addr, 0xD, 0x0002);
+-				phy_write(phydev, phydev->addr, 0xE, 0x0008); // Reg 0x8
+-				phy_write(phydev, phydev->addr, 0xD, 0x4002);
+-				phy_write(phydev, phydev->addr, 0xE, 0x03FF); //3FF = max RXC and TXC delay
+-			}
+-			else {
+-				printf ("unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
+-				goto exit;
+-			}
+-		}
+-		/* second interface, on board */
+-		else if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR1) {
+-
+-			char * devname = phydev->dev->name;
+-
+-			phy_write(phydev, phydev->addr, 0x16, 0x0002); /* Page 2 */
+-			phy_write(phydev, phydev->addr, 0x15, 0x3010); /* GigaB */
+-			phy_write(phydev, phydev->addr, 0x16, 0x0003); /* Page 3 */
+-			phy_write(phydev, phydev->addr, 0x10, 0x1240); /* Led settings */
+-			phy_write(phydev, phydev->addr, 0x11, 0x4425);
+-
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x16, 0x0002); /* Page 2 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x15, 0x3010); /* GigaB */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x16, 0x0003); /* Page 3 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x10, 0x1240); /* Led settings */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x11, 0x4425);
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR2, 0x00, 0x9140); /* Reset */
+-
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x16, 0x0002); /* Page 2 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x15, 0x3010); /* GigaB */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x16, 0x0003); /* Page 3 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x10, 0x1240); /* Led settings */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x11, 0x4425);
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR3, 0x00, 0x9140); /* Reset */
+-
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x16, 0x0002); /* Page 2 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x15, 0x3010); /* GigaB */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x16, 0x0003); /* Page 3 */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x10, 0x1240); /* Led settings */
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x11, 0x4425);
+-			miiphy_write (devname, CONFIG_ZYNQ_GEM_PHY_ADDR4, 0x00, 0x9140); /* Reset */
+-		}
++	static int do_once_gem0 = 0;
++	static int do_once_gem1 = 0;
++
++	printf("board phy config: %u\n", phydev->addr);
++	/* first interface, on module */
++	if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR0) {
++	    if (do_once_gem0 == 0) {
++	        /* Giga skew value */
++	        if (phydev->phy_id == 0x221611) { /* KSZ9021, used on first board series */
++	            printf("board phy config: KSZ9021 @ %u\n", phydev->addr);
++	            phy_write(phydev, phydev->addr, 0xB, 0x8104); // RGMII clock and control pad skew (reg 260)
++	            phy_write(phydev, phydev->addr, 0xC, 0xF0F0);
++	            phy_write(phydev, phydev->addr, 0xB, 0x8105); // RGMII RX pad skew (reg 261)
++	            phy_write(phydev, phydev->addr, 0xC, 0x0);
++	            do_once_gem0 = 1;
++	        }
++	        if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++	            printf("board phy config: KSZ9031 @ %u\n", phydev->addr);
++	            phy_write(phydev, phydev->addr, 0xD, 0x0002);
++	            phy_write(phydev, phydev->addr, 0xE, 0x0008); // Reg 0x8
++	            phy_write(phydev, phydev->addr, 0xD, 0x4002);
++	            phy_write(phydev, phydev->addr, 0xE, 0x03FF); //3FF = max RXC and TXC delay
++	            do_once_gem0 = 1;
++	        }
++	        else {
++	            printf ("board phy config: unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
++	        }
++	    }
++	}
++	/* second interface, on board */
++	else if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR1) {
++	    if (do_once_gem1 == 0) {
++	        printf("board phy config:  MV88E1118 @ %u\n", phydev->addr);
++	        phy_write(phydev, phydev->addr, 0x16, 0x0002); /* Page 2 */
++	        phy_write(phydev, phydev->addr, 0x15, 0x3010); /* GigaB */
++	        phy_write(phydev, phydev->addr, 0x16, 0x0003); /* Page 3 */
++	        phy_write(phydev, phydev->addr, 0x10, 0x1240); /* Led settings */
++	        phy_write(phydev, phydev->addr, 0x11, 0x4425);
++	        do_once_gem1 = 1;
++	    }
++
+ 	}
+ 
+-	do_once = 1;
+-exit:
+ 	/* call the standard PHY configuration as well */
+ 	if (phydev->drv->config)
+ 		phydev->drv->config(phydev);
+@@ -290,7 +277,7 @@ int zx3_read_mac_address(uint8_t *buf, uint8_t index)
+ {
+ 	/* we have only two interfaces */
+ 	if (index > 1)
+-	return 0;
++	    return 0;
+ 
+ 	/* Read MAC address. */
+ 	if (i2c_read(ZX3_SHA_EEPROM_ADDR, ZX3_SHA_EEPROM_MAC_OFFSET,
+@@ -321,6 +308,7 @@ int board_eth_init(bd_t *bis)
+ 	u32 ret = 0;
+ 	u_int8_t mac[6];
+ 
++#ifdef CONFIG_ZYNQ_GEM0
+ 	if (zx3_read_mac_address (mac, 0)) {
+ 		int err;
+ 
+@@ -329,6 +317,17 @@ int board_eth_init(bd_t *bis)
+ 		if (err)
+ 			printf("Failed to set MAC address 0 from EEPROM to env.\n");
+ 	}
++#endif
++#ifdef CONFIG_ZYNQ_GEM1
++    if (zx3_read_mac_address (mac, 1)) {
++        int err;
++
++        /* set address env if not already set */
++        err = eth_setenv_enetaddr("eth1addr", mac);
++        if (err)
++            printf("Failed to set MAC address 1 from EEPROM to env.\n");
++    }
++#endif
+ 
+ 
+ #ifdef CONFIG_XILINX_AXIEMAC
+@@ -355,7 +354,7 @@ int board_eth_init(bd_t *bis)
+ # endif
+ # if defined(CONFIG_ZYNQ_GEM1)
+ 	ret |= zynq_gem_initialize(bis, ZYNQ_GEM_BASEADDR1,
+-						CONFIG_ZYNQ_GEM_PHY_ADDR1, 0);
++						CONFIG_ZYNQ_GEM_PHY_ADDRD, 0);
+ # endif
+ #endif
+ 
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+index a650c7b..721c074 100644
+--- a/include/configs/zx3_ze7000.h
++++ b/include/configs/zx3_ze7000.h
+@@ -25,14 +25,14 @@
+ #define CONFIG_ZYNQ_SERIAL_UART0
+ 
+ #define CONFIG_ZYNQ_GEM0
+-#undef CONFIG_ZYNQ_GEM1     //@@@as
++#undef CONFIG_ZYNQ_GEM1
+ #define CONFIG_PHY_MARVEL
+ #define CONFIG_PHY_MICREL
+ #define CONFIG_ZYNQ_GEM_PHY_ADDR0        3  /* Phy at GEM0 */
+-#define CONFIG_ZYNQ_GEM_PHY_ADDR1        7  /* Phy at GEM1 */
+-#define CONFIG_ZYNQ_GEM_PHY_ADDR2        6
+-#define CONFIG_ZYNQ_GEM_PHY_ADDR3        5
+-#define CONFIG_ZYNQ_GEM_PHY_ADDR4        4
++#define CONFIG_ZYNQ_GEM_PHY_ADDRD        7  /* Phy at GEM1, PHY D */
++#define CONFIG_ZYNQ_GEM_PHY_ADDRC        6
++#define CONFIG_ZYNQ_GEM_PHY_ADDRB        5
++#define CONFIG_ZYNQ_GEM_PHY_ADDRA        4
+ 
+ #define CONFIG_CMD_NET
+ #define CONFIG_CMD_MII      /* mii utils */
+@@ -41,8 +41,8 @@
+ #define CONFIG_ZYNQ_SPI     /* SPI Flash is equipped */
+ #define CONFIG_NAND_ZYNQ    /* NAND Flash is equipped*/
+ 
+-#define CONFIG_ZYNQ_SDHCI0  //@@@as:
+-#define CONFIG_MMC          //@@@as:
++#define CONFIG_ZYNQ_SDHCI0
++#define CONFIG_MMC
+ 
+ /* Select which flash type currently uses Pins */
+ #define ZX3_NONE    (0)
+@@ -194,8 +194,41 @@
+ #define CONFIG_CMD_EEPROM
+ #define CONFIG_SYS_I2C_EEPROM_ADDR              0x54
+ #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN          2
+-#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS       5   /* 5 bits = 32 bytes */ //@@@as
++#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS       5   /* 5 bits = 32 bytes */
+ #define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS   10
+ #undef  CONFIG_SYS_I2C_MULTI_EEPROMS                /* consider only the board EEPROM */
+ 
++/**
++ * FPGA registers
++ */
++#define CONFIG_FPGA_VERSION_REG      (0x40000000)
++#define CONFIG_FPGA_PHYCTRL_REG      (0x40000010)
++
++
++#define CONFIG_FPGA_VERSION_BUILD_FSB   (0)
++#define CONFIG_FPGA_VERSION_BUILD_BITS  (8)
++#define CONFIG_FPGA_VERSION_BUILD_MASK  (((1 << CONFIG_FPGA_VERSION_BUILD_BITS) - 1) << CONFIG_FPGA_VERSION_BUILD_FSB)
++#define CONFIG_FPGA_VERSION_MINOR_FSB   (8)
++#define CONFIG_FPGA_VERSION_MINOR_BITS  (4)
++#define CONFIG_FPGA_VERSION_MINOR_MASK  (((1 << CONFIG_FPGA_VERSION_MINOR_BITS) - 1) << CONFIG_FPGA_VERSION_MINOR_FSB)
++#define CONFIG_FPGA_VERSION_MAJOR_FSB   (12)
++#define CONFIG_FPGA_VERSION_MAJOR_BITS  (4)
++#define CONFIG_FPGA_VERSION_MAJOR_MASK  (((1 << CONFIG_FPGA_VERSION_MAJOR_BITS) - 1) << CONFIG_FPGA_VERSION_MAJOR_FSB)
++
++#define CONFIG_FPGA_PHYCTRL_MODPHY_FSB   (4)
++#define CONFIG_FPGA_PHYCTRL_MODPHY_BITS  (1)
++#define CONFIG_FPGA_PHYCTRL_MODPHY_MASK  (((1 << CONFIG_FPGA_PHYCTRL_MODPHY_BITS) - 1) << CONFIG_FPGA_PHYCTRL_MODPHY_FSB)
++#define CONFIG_FPGA_PHYCTRL_PHYD_FSB     (3)
++#define CONFIG_FPGA_PHYCTRL_PHYD_BITS    (1)
++#define CONFIG_FPGA_PHYCTRL_PHYD_MASK    (((1 << CONFIG_FPGA_PHYCTRL_PHYD_BITS) - 1) << CONFIG_FPGA_PHYCTRL_PHYD_FSB)
++#define CONFIG_FPGA_PHYCTRL_PHYC_FSB     (2)
++#define CONFIG_FPGA_PHYCTRL_PHYC_BITS    (1)
++#define CONFIG_FPGA_PHYCTRL_PHYC_MASK    (((1 << CONFIG_FPGA_PHYCTRL_PHYC_BITS) - 1) << CONFIG_FPGA_PHYCTRL_PHYD_FSB)
++#define CONFIG_FPGA_PHYCTRL_PHYB_FSB     (1)
++#define CONFIG_FPGA_PHYCTRL_PHYB_BITS    (1)
++#define CONFIG_FPGA_PHYCTRL_PHYB_MASK    (((1 << CONFIG_FPGA_PHYCTRL_PHYB_BITS) - 1) << CONFIG_FPGA_PHYCTRL_PHYB_FSB)
++#define CONFIG_FPGA_PHYCTRL_PHYA_FSB     (0)
++#define CONFIG_FPGA_PHYCTRL_PHYA_BITS    (1)
++#define CONFIG_FPGA_PHYCTRL_PHYA_MASK    (((1 << CONFIG_FPGA_PHYCTRL_PHYA_BITS) - 1) << CONFIG_FPGA_PHYCTRL_PHYA_FSB)
++
+ #endif /* __CONFIG_ZX3_ZE7000_H */
+-- 
+1.7.10.4
+

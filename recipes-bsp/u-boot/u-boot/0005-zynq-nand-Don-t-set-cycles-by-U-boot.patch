@@ -1,0 +1,28 @@
+From e7453cf88a7c708e60a07b649851946ddc8e7b75 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Mon, 16 Sep 2013 13:36:28 +0200
+Subject: [PATCH 05/20] zynq: nand: Don't set cycles by U-boot
+
+FSBL already sets correct NAND timings, do not override them by Uboot
+---
+ drivers/mtd/nand/zynq_nand.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mtd/nand/zynq_nand.c b/drivers/mtd/nand/zynq_nand.c
+index 87fb98b..11fdb2b 100644
+--- a/drivers/mtd/nand/zynq_nand.c
++++ b/drivers/mtd/nand/zynq_nand.c
+@@ -268,8 +268,8 @@ static int zynq_nand_init_nand_flash(int option)
+ 
+ 	/* disable interrupts */
+ 	writel(ZYNQ_NAND_CLR_CONFIG, &zynq_nand_smc_base->cfr);
+-	/* Initialize the NAND interface by setting cycles and operation mode */
+-	writel(ZYNQ_NAND_SET_CYCLES, &zynq_nand_smc_base->scr);
++	/* Initialize the NAND interface by setting operation mode.
++	 * NAND cycles already set by FSBL */
+ 	if (option & NAND_BUSWIDTH_16)
+ 		writel((ZYNQ_NAND_SET_OPMODE | 0x1), &zynq_nand_smc_base->sor);
+ 	else
+-- 
+1.7.10.4
+

@@ -1,0 +1,63 @@
+From 4c9c12816aded65e8bc368653d12b60aab16667f Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Wed, 18 Sep 2013 13:56:44 +0200
+Subject: [PATCH 07/20] zx3_pm3: fixed SDIO configuration
+
+---
+ board/enclustra/zx3_pm3/board.c |    4 ++--
+ include/configs/zx3_pm3.h       |    3 ---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index 3a6c017..c6bed1a 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -307,6 +307,7 @@ int board_eth_init(bd_t *bis)
+ /**
+  * Set the pin muxing for QSPI NOR access
+  */
++#ifdef CONFIG_ZYNQ_SDHCI0
+ static void set_mio_mux_sdio0( void ){
+ #define MUXPINVALUE 0x0000000680
+ 
+@@ -321,13 +322,13 @@ static void set_mio_mux_sdio0( void ){
+ 
+     writel(0x767B, &slcr_base->slcr_lock);          //lock slcr
+ }
++#endif
+ 
+ #ifdef CONFIG_CMD_MMC
+ int board_mmc_init(bd_t *bd)
+ {
+     int ret = 0;
+ 
+-#if defined(CONFIG_ZYNQ_SDHCI)
+ # if defined(CONFIG_ZYNQ_SDHCI0)
+     set_mio_mux_sdio0();
+     ret = zynq_sdhci_init(ZYNQ_SDHCI_BASEADDR0);
+@@ -335,7 +336,6 @@ int board_mmc_init(bd_t *bd)
+ # if defined(CONFIG_ZYNQ_SDHCI1)
+     ret |= zynq_sdhci_init(ZYNQ_SDHCI_BASEADDR1);
+ # endif
+-#endif
+     return ret;
+ }
+ #endif
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 93a81f3..6e550d4 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -36,10 +36,7 @@
+ #define CONFIG_ZYNQ_SPI     /* SPI Flash is equipped */
+ #define CONFIG_NAND_ZYNQ    /* NAND Flash is equipped*/
+ 
+-#define CONFIG_ZYNQ_SDHCI
+ #define CONFIG_ZYNQ_SDHCI0
+-#define CONFIG_CMD_MMC
+-#define CONFIG_GENERIC_MMC
+ 
+ /* Select which flash type currently uses Pins */
+ #define ZX3_NONE    (0)
+-- 
+1.7.10.4
+

@@ -1,0 +1,89 @@
+From 5bd8fc6ce9bf3657b201b007dbfa0b19b2985420 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 21 Nov 2013 14:33:22 +0100
+Subject: [PATCH 17/20] zx3_pm3: added configuration for skew values
+
+Micrel Gbit phy on ZX3 module needs adaptions of the skew values
+---
+ board/enclustra/zx3_pm3/board.c |   37 ++++++++++++++++++++++++++++++++++++-
+ include/configs/zx3_pm3.h       |    2 +-
+ 2 files changed, 37 insertions(+), 2 deletions(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index 21a838d..323a61e 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -32,6 +32,7 @@
+ 
+ #include <nand.h>
+ #include <i2c.h>
++#include <phy.h>
+ 
+ #define BOOT_MODE_REG     (ZYNQ_SYS_CTRL_BASEADDR + 0x25C)
+ #define BOOT_MODES_MASK    0x0000000F
+@@ -39,7 +40,7 @@
+ #define NOR_FLASH_MODE    (0x00000002)            /**< NOR  */
+ #define NAND_FLASH_MODE   (0x00000004)            /**< NAND */
+ #define SD_MODE           (0x00000005)            /**< Secure Digital card */
+-#define JTAG_MODE	  (0x00000000)		  /**< JTAG */
++#define JTAG_MODE         (0x00000000)            /**< JTAG */
+ 
+ extern int zynq_nand_init(struct nand_chip *nand_chip, int devnum);
+ 
+@@ -220,6 +221,40 @@ void zx3_set_storage (int store) {
+ }
+ 
+ #ifdef CONFIG_CMD_NET
++int board_phy_config(struct phy_device *phydev)
++{
++	static int do_once;
++
++	if (!do_once) {
++		/* first interface, on module */
++		if (phydev->dev->iobase == 0xe000b000 /*ZYNQ_GEM_BASEADDR0*/) {
++			/* Giga skew value */
++			if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++				phy_write(phydev, phydev->addr, 0xD, 0x0002);
++				phy_write(phydev, phydev->addr, 0xE, 0x0008); // Reg 0x8
++				phy_write(phydev, phydev->addr, 0xD, 0x4002);
++				phy_write(phydev, phydev->addr, 0xE, 0x03FF); //3FF = max RXC and TXC delay
++			}
++			else {
++				printf ("unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
++				goto exit;
++			}
++		}
++		else {
++			printf("unsupported GEM base addr: 0x%X", phydev->dev->iobase);
++			goto exit;
++		}
++	}
++
++	do_once = 1;
++exit:
++	/* call the standard PHY configuration as well */
++	if (phydev->drv->config)
++		phydev->drv->config(phydev);
++
++	return 0;
++}
++
+ /**
+  * Read the MAC address in the module EEPROM
+  */
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index 5e6d278..d35c358 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -27,7 +27,7 @@
+ 
+ #define CONFIG_ZYNQ_GEM0
+ #define CONFIG_PHY_MICREL
+-#define CONFIG_ZYNQ_GEM_PHY_ADDR0   3
++#define CONFIG_ZYNQ_GEM_PHY_ADDR0   3  /* Phy at GEM0 */
+ 
+ #define CONFIG_CMD_NET
+ #define CONFIG_CMD_MII      /* mii utils */
+-- 
+1.7.10.4
+
