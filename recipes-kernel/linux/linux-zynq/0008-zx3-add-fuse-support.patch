@@ -1,7 +1,7 @@
 From 50981a0d24f368990c002f165b91b04edfb35908 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 24 Jul 2013 15:51:46 +0200
-Subject: [PATCH 8/8] zx3: add fuse support
+Subject: [PATCH 8/9] zx3: add fuse support
 
 Add support for FUSE to allow usage of ntfs-3g
 
@@ -40,5 +40,5 @@ index ffe4739..369faf3 100644
  #
  # Caches
 -- 
-1.7.4.1
+1.7.10.4
 

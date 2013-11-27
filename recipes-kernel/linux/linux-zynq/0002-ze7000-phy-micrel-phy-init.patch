@@ -1,7 +1,7 @@
 From 9406319fdbe72b18bedfa5e82ac5cc91cbf1c94c Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Mon, 22 Jul 2013 16:32:06 +0200
-Subject: [PATCH 2/7] ze7000: phy: micrel phy init
+Subject: [PATCH 2/9] ze7000: phy: micrel phy init
 
 Add support for the KSZ9031 and use a custom init.
 Each time the PL is loaded, the PHY goes in reset.
@@ -11,7 +11,7 @@ Signed-off-by: David Andrey <david.andrey@netmodule.com>
 ---
  drivers/net/phy/micrel.c   |   77 +++++++++++++++++++++++++++++++++++++++++++-
  include/linux/micrel_phy.h |    1 +
- 2 files changed, 77 insertions(+), 1 deletions(-)
+ 2 files changed, 77 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
 index b983596..f33aca8 100644
@@ -140,5 +140,5 @@ index adfe8c0..e009aa4 100644
  #define PHY_ID_KSZ8021		0x00221555
  #define PHY_ID_KSZ8041		0x00221510
 -- 
-1.7.4.1
+1.7.10.4
 

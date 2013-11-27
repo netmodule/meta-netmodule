@@ -1,0 +1,52 @@
+From 127212c42bdc917edf64319130db3d1a96b1048e Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 27 Nov 2013 17:15:48 +0100
+Subject: [PATCH 9/9] ze7000: fix memory size and mtd layout in dts
+
+RAM size is now 512 MB as expected and MTD layout
+equal to other ZX3 boards
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ arch/arm/boot/dts/ze7000.dts |   15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/ze7000.dts b/arch/arm/boot/dts/ze7000.dts
+index f8f435f..174b5b8 100644
+--- a/arch/arm/boot/dts/ze7000.dts
++++ b/arch/arm/boot/dts/ze7000.dts
+@@ -26,7 +26,7 @@
+ 
+ 	memory {
+ 		device_type = "memory";
+-		reg = <0x0 0x10000000>; /* 256 MB until ZX3 Rev.B*/
++		reg = <0x0 0x20000000>; /* 512 MB */
+ 	};
+ 
+ 	chosen {
+@@ -258,13 +258,18 @@
+ 				#size-cells = <1>;
+ 
+ 				partition@0 {
+-					label = "boot-img";
+-					reg = <0x0 0x1000000>; /* 16MB for boot image */
++					label = "nand-linux";
++					reg = <0x0 0x500000>;
+ 				};
+ 				
+ 				partition@1 {
+-					label = "linux";
+-					reg = <0x1000000 0x0>; /* maximum size */
++					label = "nand-device-tree";
++					reg = <0x500000 0x100000>;
++				};
++				
++				partition@2 {
++					label = "nand-rootfs";
++					reg = <0x600000 0x0>; /* maximum size */
+ 				};
+ 			};
+ 		};
+-- 
+1.7.10.4
+

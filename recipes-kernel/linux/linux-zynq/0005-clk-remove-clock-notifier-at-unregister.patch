@@ -1,7 +1,7 @@
 From 6fa8e18e6a681ff94c08fba3dd16c72b435debb8 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Mon, 22 Apr 2013 14:09:15 +0200
-Subject: [PATCH 5/7] clk: remove clock notifier at unregister
+Subject: [PATCH 5/9] clk: remove clock notifier at unregister
 
 Clock notifier node is now removed from the
 notifier list during unregister
@@ -10,7 +10,7 @@ Signed-off-by: David Andrey <david.andrey@netmodule.com>
 Acked-by: Martin Meuli <martin.meuli@netmodule.com>
 ---
  drivers/clk/clk.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
 index 251e45d..8106dc3 100644
@@ -28,5 +28,5 @@ index 251e45d..8106dc3 100644
  		}
  
 -- 
-1.7.4.1
+1.7.10.4
 
