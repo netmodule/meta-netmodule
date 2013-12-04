@@ -1,7 +1,7 @@
 From e88e1bc3ba9cf1d2982617a422ce79cb7853007e Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 23 Jul 2013 14:04:44 +0200
-Subject: [PATCH 7/9] zx3-starter: initial board support
+Subject: [PATCH 07/10] zx3-starter: initial board support
 
 Add own DTS and kernel configuration for the
 Enclustra ZX3-Starter board.

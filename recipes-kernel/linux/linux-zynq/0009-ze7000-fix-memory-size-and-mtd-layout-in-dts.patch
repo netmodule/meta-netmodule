@@ -1,7 +1,7 @@
 From 127212c42bdc917edf64319130db3d1a96b1048e Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Wed, 27 Nov 2013 17:15:48 +0100
-Subject: [PATCH 9/9] ze7000: fix memory size and mtd layout in dts
+Subject: [PATCH 09/10] ze7000: fix memory size and mtd layout in dts
 
 RAM size is now 512 MB as expected and MTD layout
 equal to other ZX3 boards

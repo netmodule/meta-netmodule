@@ -1,7 +1,7 @@
 From 7772284690b8825568a28221ca8c08df11764011 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Mon, 22 Jul 2013 16:26:54 +0200
-Subject: [PATCH 1/9] ze7000: initial support for board
+Subject: [PATCH 01/10] ze7000: initial support for board
 
 Add initial support for the NetModule ZE7000
 through default dts and default kernel configuration

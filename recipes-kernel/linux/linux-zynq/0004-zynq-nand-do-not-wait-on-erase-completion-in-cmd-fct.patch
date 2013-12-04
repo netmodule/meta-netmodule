@@ -1,7 +1,7 @@
 From f8796212674a3f6727bea97b505e6a432955f9c8 Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Fri, 26 Apr 2013 10:46:28 +0200
-Subject: [PATCH 4/9] zynq: nand: do not wait on erase completion in cmd fct
+Subject: [PATCH 04/10] zynq: nand: do not wait on erase completion in cmd fct
 
 The chip command function dont have to wait on ERASE
 completion as the dev_ready chip function is defined

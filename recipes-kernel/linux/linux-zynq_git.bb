@@ -42,6 +42,7 @@ SRC_URI_append = " file://0001-ze7000-initial-support-for-board.patch           
                    file://0007-zx3-starter-initial-board-support.patch                    \
                    file://0008-zx3-add-fuse-support.patch                                 \
                    file://0009-ze7000-fix-memory-size-and-mtd-layout-in-dts.patch         \
+				   file://0010-ze7000-add-ramdisk-support.patch                           \
                   "
 
 S = "${WORKDIR}/git"

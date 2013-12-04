@@ -1,7 +1,7 @@
 From 8345997f0a688b9c61487f7bd839ee9382d967ba Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Tue, 23 Jul 2013 13:54:39 +0200
-Subject: [PATCH 6/9] zx3-pm3: add board initial support
+Subject: [PATCH 06/10] zx3-pm3: add board initial support
 
 Add own DTS and kernel configuration for the
 Enclustra ZX3-PM3 board

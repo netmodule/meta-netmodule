@@ -1,7 +1,7 @@
 From d8485981322f86c9515480b511b16810501160df Mon Sep 17 00:00:00 2001
 From: David Andrey <david.andrey@netmodule.com>
 Date: Mon, 22 Jul 2013 16:36:27 +0200
-Subject: [PATCH 3/9] ze7000: phy: adapt marvell settings
+Subject: [PATCH 03/10] ze7000: phy: adapt marvell settings
 
 The onboard PHY is compatible with the 88E1116R,
 based on the UID at least

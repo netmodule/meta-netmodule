@@ -1,0 +1,77 @@
+From 216a131a687e0669a915e180d82d7fc96cae236b Mon Sep 17 00:00:00 2001
+From: David Andrey <david.andrey@netmodule.com>
+Date: Wed, 4 Dec 2013 11:00:34 +0100
+Subject: [PATCH 10/10] ze7000: add ramdisk support
+
+Add RamDisk support in the kernel configuration for the
+ZE7000 board
+
+Signed-off-by: David Andrey <david.andrey@netmodule.com>
+---
+ arch/arm/configs/ze7000_defconfig |   29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/configs/ze7000_defconfig b/arch/arm/configs/ze7000_defconfig
+index 50c0f48..bc8a717 100644
+--- a/arch/arm/configs/ze7000_defconfig
++++ b/arch/arm/configs/ze7000_defconfig
+@@ -101,7 +101,13 @@ CONFIG_LOG_BUF_SHIFT=14
+ CONFIG_SYSFS_DEPRECATED=y
+ CONFIG_SYSFS_DEPRECATED_V2=y
+ # CONFIG_RELAY is not set
+-# CONFIG_BLK_DEV_INITRD is not set
++CONFIG_BLK_DEV_INITRD=y
++CONFIG_INITRAMFS_SOURCE=""
++CONFIG_RD_GZIP=y
++CONFIG_RD_BZIP2=y
++CONFIG_RD_LZMA=y
++CONFIG_RD_XZ=y
++CONFIG_RD_LZO=y
+ CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+ CONFIG_SYSCTL=y
+ CONFIG_ANON_INODES=y
+@@ -780,8 +786,8 @@ CONFIG_BLK_DEV_LOOP_MIN_COUNT=8
+ # CONFIG_BLK_DEV_DRBD is not set
+ # CONFIG_BLK_DEV_NBD is not set
+ CONFIG_BLK_DEV_RAM=y
+-CONFIG_BLK_DEV_RAM_COUNT=16
+-CONFIG_BLK_DEV_RAM_SIZE=16384
++CONFIG_BLK_DEV_RAM_COUNT=4
++CONFIG_BLK_DEV_RAM_SIZE=32768
+ # CONFIG_BLK_DEV_XIP is not set
+ # CONFIG_CDROM_PKTCDVD is not set
+ # CONFIG_ATA_OVER_ETH is not set
+@@ -1307,6 +1313,7 @@ CONFIG_WATCHDOG_CORE=y
+ CONFIG_MPCORE_WATCHDOG=y
+ CONFIG_XILINX_PS_WATCHDOG=y
+ # CONFIG_MAX63XX_WATCHDOG is not set
++# CONFIG_XILINX_WATCHDOG is not set
+ CONFIG_SSB_POSSIBLE=y
+ 
+ #
+@@ -1979,8 +1986,20 @@ CONFIG_ZLIB_INFLATE=y
+ CONFIG_ZLIB_DEFLATE=y
+ CONFIG_LZO_COMPRESS=y
+ CONFIG_LZO_DECOMPRESS=y
+-# CONFIG_XZ_DEC is not set
+-# CONFIG_XZ_DEC_BCJ is not set
++CONFIG_XZ_DEC=y
++CONFIG_XZ_DEC_X86=y
++CONFIG_XZ_DEC_POWERPC=y
++CONFIG_XZ_DEC_IA64=y
++CONFIG_XZ_DEC_ARM=y
++CONFIG_XZ_DEC_ARMTHUMB=y
++CONFIG_XZ_DEC_SPARC=y
++CONFIG_XZ_DEC_BCJ=y
++# CONFIG_XZ_DEC_TEST is not set
++CONFIG_DECOMPRESS_GZIP=y
++CONFIG_DECOMPRESS_BZIP2=y
++CONFIG_DECOMPRESS_LZMA=y
++CONFIG_DECOMPRESS_XZ=y
++CONFIG_DECOMPRESS_LZO=y
+ CONFIG_HAS_IOMEM=y
+ CONFIG_HAS_DMA=y
+ CONFIG_CPU_RMAP=y
+-- 
+1.7.10.4
+
