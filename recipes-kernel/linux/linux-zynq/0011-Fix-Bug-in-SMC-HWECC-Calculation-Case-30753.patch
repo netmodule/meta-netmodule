@@ -1,0 +1,26 @@
+From e2f60e75bac4f223b295ff55192e96268138501a Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Tue, 20 Aug 2013 08:37:07 +0200
+Subject: [PATCH] Fix Bug in SMC HWECC Calculation, Case 30753
+
+Signed-off-by: andreas salvisberg <andreas.salvisberg@netmodule.com>
+---
+ drivers/memory/zynq-smc.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/memory/zynq-smc.c b/drivers/memory/zynq-smc.c
+index e073530..4fbc6f2 100644
+--- a/drivers/memory/zynq-smc.c
++++ b/drivers/memory/zynq-smc.c
+@@ -170,7 +170,7 @@ u32 xsmcps_get_ecc_val(int ecc_reg)
+ 	unsigned long flags;
+ 
+ 	ecc_reg &= 3;
+-	addr = XSMCPS_ECC_VALUE0_OFFS | (ecc_reg << 2);
++	addr = XSMCPS_ECC_VALUE0_OFFS + (ecc_reg << 2);
+ 
+ 	spin_lock_irqsave(&xsmcps_lock, flags);
+ 
+-- 
+1.7.10.4
+
