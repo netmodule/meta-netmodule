@@ -1,0 +1,67 @@
+From 5105dacd1668d76b7a430ae8bb04f818d711f779 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Tue, 3 Dec 2013 16:22:19 +0100
+Subject: [PATCH 23/26] zx3_pm3: added again support for phy KSZ9021 on rev 1
+ ZX3 modules
+
+---
+ board/enclustra/zx3_pm3/board.c |   16 ++++++++++++----
+ include/configs/zx3_pm3.h       |    1 +
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/board/enclustra/zx3_pm3/board.c b/board/enclustra/zx3_pm3/board.c
+index 323a61e..b41cb90 100644
+--- a/board/enclustra/zx3_pm3/board.c
++++ b/board/enclustra/zx3_pm3/board.c
+@@ -227,16 +227,24 @@ int board_phy_config(struct phy_device *phydev)
+ 
+ 	if (!do_once) {
+ 		/* first interface, on module */
+-		if (phydev->dev->iobase == 0xe000b000 /*ZYNQ_GEM_BASEADDR0*/) {
++	if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR0) {
+ 			/* Giga skew value */
+-			if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++			if (phydev->phy_id == 0x00221611) { /* KSZ9021, used on first board series */
++				printf("board phy config: KSZ9021 @ %u\n", phydev->addr);
++				phy_write(phydev, phydev->addr, 0xB, 0x8104); // RGMII clock and control pad skew (reg 260)
++				phy_write(phydev, phydev->addr, 0xC, 0xF0F0);
++				phy_write(phydev, phydev->addr, 0xB, 0x8105); // RGMII RX pad skew (reg 261)
++				phy_write(phydev, phydev->addr, 0xC, 0x0);
++			}
++			else if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++				printf("board phy config: KSZ9031 @ %u\n", phydev->addr);
+ 				phy_write(phydev, phydev->addr, 0xD, 0x0002);
+ 				phy_write(phydev, phydev->addr, 0xE, 0x0008); // Reg 0x8
+ 				phy_write(phydev, phydev->addr, 0xD, 0x4002);
+ 				phy_write(phydev, phydev->addr, 0xE, 0x03FF); //3FF = max RXC and TXC delay
+ 			}
+ 			else {
+-				printf ("unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
++				printf ("board phy config: unsupported PHY Model, ID:0x%08X\n", phydev->phy_id);
+ 				goto exit;
+ 			}
+ 		}
+@@ -262,7 +270,7 @@ int zx3_read_mac_address(uint8_t *buf, uint8_t index)
+ {
+ 	/* we have only two interfaces */
+ 	if (index > 1)
+-	return 0;
++		return 0;
+ 
+ 	/* Read MAC address. */
+ 	if (i2c_read(ZX3_SHA_EEPROM_ADDR, ZX3_SHA_EEPROM_MAC_OFFSET,
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index df38bdb..c72aed6 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -27,6 +27,7 @@
+ 
+ #define CONFIG_ZYNQ_GEM0
+ #define CONFIG_PHY_MICREL
++#define CONFIG_PHY_MICREL_KSZ9021      /* Equipped on old ZX3 modules */
+ #define CONFIG_ZYNQ_GEM_PHY_ADDR0   3  /* Phy at GEM0 */
+ 
+ #define CONFIG_CMD_NET
+-- 
+1.7.10.4
+

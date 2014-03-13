@@ -1,0 +1,51 @@
+From b5909bbbe0a7efb0142ff02081419319d14525f5 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 13 Mar 2014 08:12:56 +0100
+Subject: [PATCH 26/26] zx3: switch pin muxing to nand for ramdisk boot
+
+Before starting the ramdisk boot boot u-boot has to switch to nand device.
+---
+ include/configs/zx3_pm3.h     |    1 +
+ include/configs/zx3_starter.h |    1 +
+ include/configs/zx3_ze7000.h  |    1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/include/configs/zx3_pm3.h b/include/configs/zx3_pm3.h
+index c72aed6..df1cff9 100644
+--- a/include/configs/zx3_pm3.h
++++ b/include/configs/zx3_pm3.h
+@@ -124,6 +124,7 @@
+         "tftp 0x3000000 ${kernel_image};" \
+         "tftp 0x2A00000 ${devicetree_image};" \
+         "tftp 0x2000000 ${ramdisk_image};" \
++        "nand device 0;" \
+         "run ramargs;" \
+         "bootm 0x3000000 0x2000000 0x2A00000\0" \
+     "modeboot=prodboot\0"
+diff --git a/include/configs/zx3_starter.h b/include/configs/zx3_starter.h
+index 9975e63..dd95b3a 100644
+--- a/include/configs/zx3_starter.h
++++ b/include/configs/zx3_starter.h
+@@ -124,6 +124,7 @@
+         "tftp 0x3000000 ${kernel_image};" \
+         "tftp 0x2A00000 ${devicetree_image};" \
+         "tftp 0x2000000 ${ramdisk_image};" \
++        "nand device 0;" \
+         "run ramargs;" \
+         "bootm 0x3000000 0x2000000 0x2A00000\0" \
+     "modeboot=prodboot\0"
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+index 25133c1..2ecbbaf 100644
+--- a/include/configs/zx3_ze7000.h
++++ b/include/configs/zx3_ze7000.h
+@@ -131,6 +131,7 @@
+         "tftp 0x3000000 ${kernel_image};" \
+         "tftp 0x2A00000 ${devicetree_image};" \
+         "tftp 0x2000000 ${ramdisk_image};" \
++        "nand device 0;" \
+         "run ramargs;" \
+         "bootm 0x3000000 0x2000000 0x2A00000\0" \
+     "modeboot=prodboot\0"
+-- 
+1.7.10.4
+

@@ -31,6 +31,11 @@ SRC_URI_append += " file://0001-zynq-BSP-support-for-ZX3_PM3-board.patch        
                     file://0019-zx3_pm3-i2c-adapted-page-write.patch                        \
                     file://0020-zx3_ze7000-prepared-to-use-eth0-and-eth1-PHY-reset-b.patch  \
                     file://0021-zynq-BSP-support-for-ZX3_STARTER-board.patch                \
+                    file://0022-zx3_ze7000-phy-fixed-branch-between-various-micrel-p.patch  \
+                    file://0023-zx3_pm3-added-again-support-for-phy-KSZ9021-on-rev-1.patch  \
+                    file://0024-zx3_starter-added-again-support-for-phy-KSZ9021-on-r.patch  \
+                    file://0025-zx3_ze7000-set-CPU-core-frequency-macro-to-667MHz.patch     \
+                    file://0026-zx3-switch-pin-muxing-to-nand-for-ramdisk-boot.patch        \
                     "
 
 UBOOT_MACHINE_zynq-zx3-pm3 = "zx3_pm3"
