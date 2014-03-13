@@ -1,0 +1,91 @@
+From 0dd9eea168c1d7428771b83b5a7a3f0f6b8d614c Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Thu, 22 Aug 2013 16:14:13 +0200
+Subject: [PATCH] zynq: smc: do not change timing configuration
+
+Signed-off-by: andreas salvisberg <andreas.salvisberg@netmodule.com>
+---
+ arch/arm/boot/dts/ze7000.dts |   11 +++++++----
+ drivers/memory/zynq-smc.c    |   12 +++++++++++-
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/ze7000.dts b/arch/arm/boot/dts/ze7000.dts
+index 174b5b8..5f761d8 100644
+--- a/arch/arm/boot/dts/ze7000.dts
++++ b/arch/arm/boot/dts/ze7000.dts
+@@ -246,11 +246,14 @@
+ 				compatible = "xlnx,ps7-nand-1.00.a";
+ 				reg = <0xe1000000 0x1000000>;
+ 				xlnx,nand-width = <8>;
+-				/* timings in smc cycles count */
+-				xlnx,nand-cycle-t0 = <3>; /* tRC */
+-				xlnx,nand-cycle-t1 = <3>; /* tWC */
++				/* timings in smc cycles count 
++				   Timings will be set by FSBL, linux should not change them.
++				   Look out for DONT_TOUCH_SMC_NAND_TIMING_WIDTH in zynq-smc.c.
++				*/
++				xlnx,nand-cycle-t0 = <4>; /* tRC */
++				xlnx,nand-cycle-t1 = <4>; /* tWC */
+ 				xlnx,nand-cycle-t2 = <1>; /* tREA */
+-				xlnx,nand-cycle-t3 = <2>; /* tWP */
++				xlnx,nand-cycle-t3 = <3>; /* tWP */
+ 				xlnx,nand-cycle-t4 = <2>; /* tCLR */
+ 				xlnx,nand-cycle-t5 = <2>; /* tAR */
+ 				xlnx,nand-cycle-t6 = <3>; /* tRR */
+diff --git a/drivers/memory/zynq-smc.c b/drivers/memory/zynq-smc.c
+index 4fbc6f2..ab42883 100644
+--- a/drivers/memory/zynq-smc.c
++++ b/drivers/memory/zynq-smc.c
+@@ -28,6 +28,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
++//NM: SMC setup for NAND timings and width only executed by FSBL
++#define DONT_TOUCH_SMC_NAND_TIMING_WIDTH
++
+ /* Register definitions */
+ #define XSMCPS_MEMC_STATUS_OFFS		0	/* Controller status reg, RO */
+ #define XSMCPS_CFG_CLR_OFFS		0xC	/* Clear config reg, WO */
+@@ -71,6 +74,7 @@ struct xsmcps_data {
+ static void __iomem *xsmcps_base;
+ static DEFINE_SPINLOCK(xsmcps_lock);
+ 
++#ifndef DONT_TOUCH_SMC_NAND_TIMING_WIDTH
+ /**
+  * xsmcps_set_buswidth - Set memory buswidth
+  * @bw	Memory buswidth (8 | 16)
+@@ -123,6 +127,7 @@ static void xsmcps_set_cycles(u32 t0, u32 t1, u32 t2, u32 t3, u32
+ 
+ 	writel(t0, xsmcps_base + XSMCPS_SET_CYCLES_OFFS);
+ }
++#endif
+ 
+ /**
+  * xsmcps_ecc_is_busy_noirq - Read ecc busy flag
+@@ -353,10 +358,11 @@ static SIMPLE_DEV_PM_OPS(xsmcps_dev_pm_ops, xsmcps_suspend, xsmcps_resume);
+ static void xsmcps_init_nand_interface(struct platform_device *pdev,
+ 		struct device_node *nand_node)
+ {
++	unsigned long flags;
++#ifndef DONT_TOUCH_SMC_NAND_TIMING_WIDTH
+ 	u32 t_rc, t_wc, t_rea, t_wp, t_clr, t_ar, t_rr;
+ 	unsigned int bw;
+ 	int err;
+-	unsigned long flags;
+ 
+ 	err = of_property_read_u32(nand_node, "xlnx,nand-width", &bw);
+ 	if (err) {
+@@ -438,6 +444,10 @@ default_nand_timing:
+ 	 * is for 2Gb Numonyx flash.
+ 	 */
+ 	xsmcps_set_cycles(t_rc, t_wc, t_rea, t_wp, t_clr, t_ar, t_rr);
++#else
++	dev_warn(&pdev->dev, "xlnx,nand-width and timings not changed by linux!");
++	spin_lock_irqsave(&xsmcps_lock, flags);
++#endif
+ 	writel(XSMCPS_CFG_CLR_INT_1, xsmcps_base + XSMCPS_CFG_CLR_OFFS);
+ 	writel(XSMCPS_DC_UPT_NAND_REGS, xsmcps_base + XSMCPS_DIRECT_CMD_OFFS);
+ 	/* Wait till the ECC operation is complete */
+-- 
+1.7.10.4
+
