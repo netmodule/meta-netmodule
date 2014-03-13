@@ -45,6 +45,7 @@ SRC_URI_append = " file://0001-ze7000-initial-support-for-board.patch           
                    file://0010-ze7000-add-ramdisk-support.patch                           \
                    file://0011-Fix-Bug-in-SMC-HWECC-Calculation-Case-30753.patch          \
                    file://0012-zynq-smc-do-not-change-timing-configuration.patch          \
+                   file://0013-xdevcfg-Make-sure-that-devcfg-is-not-in-loopback-mod.patch \
                   "
 
 S = "${WORKDIR}/git"
