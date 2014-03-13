@@ -1,0 +1,26 @@
+From eb95f4f3a9212e7468aefa53fb35e1f9155e8f84 Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Mon, 24 Feb 2014 13:19:05 +0100
+Subject: [PATCH 25/26] zx3_ze7000: set CPU core frequency macro to 667MHz
+
+---
+ include/configs/zx3_ze7000.h |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+index 097acd3..25133c1 100644
+--- a/include/configs/zx3_ze7000.h
++++ b/include/configs/zx3_ze7000.h
+@@ -20,7 +20,8 @@
+ 
+ #define CONFIG_ZX3 /* ZX3 CPU Module */
+ 
+-#define PHYS_SDRAM_1_SIZE (512 * 1024 * 1024)
++#define PHYS_SDRAM_1_SIZE       (512 * 1024 * 1024)
++#define CONFIG_CPU_FREQ_HZ      666666000
+ 
+ #define CONFIG_ZYNQ_SERIAL_UART0
+ 
+-- 
+1.7.10.4
+

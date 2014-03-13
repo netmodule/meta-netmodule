@@ -1,0 +1,53 @@
+From d2966c5b65c1eaba31f7bf6608ad21536483889d Mon Sep 17 00:00:00 2001
+From: andreas salvisberg <andreas.salvisberg@netmodule.com>
+Date: Tue, 3 Dec 2013 07:05:31 +0100
+Subject: [PATCH 22/26] zx3_ze7000: phy: fixed branch between various micrel
+ phys
+
+---
+ board/netmodule/ze7000/board.c |    5 ++---
+ include/configs/zx3_ze7000.h   |    1 +
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/board/netmodule/ze7000/board.c b/board/netmodule/ze7000/board.c
+index b4a8f42..27805eb 100644
+--- a/board/netmodule/ze7000/board.c
++++ b/board/netmodule/ze7000/board.c
+@@ -223,12 +223,11 @@ int board_phy_config(struct phy_device *phydev)
+ 	static int do_once_gem0 = 0;
+ 	static int do_once_gem1 = 0;
+ 
+-	printf("board phy config: %u\n", phydev->addr);
+ 	/* first interface, on module */
+ 	if (phydev->dev->iobase == ZYNQ_GEM_BASEADDR0) {
+ 	    if (do_once_gem0 == 0) {
+ 	        /* Giga skew value */
+-	        if (phydev->phy_id == 0x221611) { /* KSZ9021, used on first board series */
++	        if (phydev->phy_id == 0x00221611) { /* KSZ9021, used on first board series */
+ 	            printf("board phy config: KSZ9021 @ %u\n", phydev->addr);
+ 	            phy_write(phydev, phydev->addr, 0xB, 0x8104); // RGMII clock and control pad skew (reg 260)
+ 	            phy_write(phydev, phydev->addr, 0xC, 0xF0F0);
+@@ -236,7 +235,7 @@ int board_phy_config(struct phy_device *phydev)
+ 	            phy_write(phydev, phydev->addr, 0xC, 0x0);
+ 	            do_once_gem0 = 1;
+ 	        }
+-	        if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
++	        else if (phydev->phy_id == 0x00221621) { /* KSZ9031 */
+ 	            printf("board phy config: KSZ9031 @ %u\n", phydev->addr);
+ 	            phy_write(phydev, phydev->addr, 0xD, 0x0002);
+ 	            phy_write(phydev, phydev->addr, 0xE, 0x0008); // Reg 0x8
+diff --git a/include/configs/zx3_ze7000.h b/include/configs/zx3_ze7000.h
+index 721c074..097acd3 100644
+--- a/include/configs/zx3_ze7000.h
++++ b/include/configs/zx3_ze7000.h
+@@ -28,6 +28,7 @@
+ #undef CONFIG_ZYNQ_GEM1
+ #define CONFIG_PHY_MARVEL
+ #define CONFIG_PHY_MICREL
++#define CONFIG_PHY_MICREL_KSZ9021           /* Equipped on old ZX3 modules */
+ #define CONFIG_ZYNQ_GEM_PHY_ADDR0        3  /* Phy at GEM0 */
+ #define CONFIG_ZYNQ_GEM_PHY_ADDRD        7  /* Phy at GEM1, PHY D */
+ #define CONFIG_ZYNQ_GEM_PHY_ADDRC        6
+-- 
+1.7.10.4
+
