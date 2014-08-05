@@ -9,7 +9,6 @@ IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL += "packagegroup-core-boot \
                 mtd-utils \
-                dhcp-client \
                 ${ROOTFS_PKGMANAGE_BOOTSTRAP} \
                 ${CORE_IMAGE_EXTRA_INSTALL} \
                 "

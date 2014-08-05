@@ -25,7 +25,6 @@ IMAGE_INSTALL += "packagegroup-core-boot \
                 openssh-sftp-server \
                 net-snmp-server \
                 nfs-utils \
-                dhcp-client \
                 u-boot-fw-utils \
                 fuse \
                 ntfs-3g \
